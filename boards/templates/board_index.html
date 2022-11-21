@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page_content %}
+<h1>Boards</h1>
+<div class="row">
+
+    {% for board in boards %}
+    {% if board.owner == request.user %}
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="{% static board.background %}"/>
+              <div class="card-body">
+                <h5 class="card-title">{{ board.title }}</h5>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <a href="{% url 'board_detail' board.pk %}" class="btn btn-primary stretched-link">Go somewhere</a>
+              </div>
+        </div>
+    {% endif %}
+    {% endfor %}
+
+</div>
+
+<div>
+    {% if user.is_authenticated %}
+    <button>
+        <a href="{% url 'board_create' %}"> Add board... </a>
+    </button>
+    {% endif %}
+</div>
+{% endblock %}
