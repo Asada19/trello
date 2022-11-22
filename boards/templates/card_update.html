@@ -1,0 +1,12 @@
+
+<!-- templates/post_new.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_content %}
+    <h1>Update card</h1>
+            <form method="post" enctype='multipart/form-data'>
+              {% csrf_token %}
+              {{ form|crispy }}
+              <input type="submit" value="Submit" onclick="window.history.back()">
+           </form>
+{% endblock %}

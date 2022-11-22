@@ -1,20 +1,20 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.shortcuts import redirect
+from django.urls import reverse
 
 
 class Board(models.Model):
     title = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE)
-    background = models.ImageField(upload_to='media', blank=True)
+    background = models.ImageField(upload_to='background', blank=True)
     favorite = models.BooleanField(default=False)
 
     def image_validator(self):
         valid_formats = ['png', 'jpeg', 'jpg']
         if not any([True if self.background.name.endswith(i) else False for i in valid_formats]):
             raise ValidationError(f'{self.background.name} is not a valid image format')
-        # TODO: Если расширения/размер фотографии большой сжимаем не теряя качество.
+    #     TODO: Если расширения/размер фотографии большой сжимаем не теряя качество.
 
     def __str__(self):
         return self.title
@@ -36,7 +36,10 @@ class Card(models.Model):
     class Meta:
         ordering = ['id']
 
+    def get_absolute_url(self):
+        return reverse('card_detail', args=[str(self.id)])
+
     def __str__(self):
-        return '{} - {} - {}'.format(self.column.board.name, self.column.title, self.title)
+        return '{} - {} - {}'.format(self.column.board.title, self.column.title, self.title)
 
 

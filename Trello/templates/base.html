@@ -77,10 +77,10 @@ body {
 
 .boards-btn {
     flex-basis: 9rem;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #fff;
-    margin-right: 0.8rem;
+    margin-right: 0.9rem;
     padding: 0.6rem 0.8rem;
 }
 
@@ -396,8 +396,10 @@ Remove or comment-out the code block below to see how the browser will fall-back
 
 		<button class="boards-btn btn" onclick="location.href='{% url "board_index" %}'"><i class="fab fa-trello boards-btn-icon" href="{% url 'board_index' %}"></i>Boards</button>
 
-		<div class="board-search">
-			<input type="search" class="board-search-input" aria-label="Board Search">
+		<div class="board-search" action="" method="get">
+			<form>
+				<input name="q" type="text" class="board-search-input" aria-label="Board Search">
+			</form>
 			<i class="fas fa-search search-icon" aria-hidden="true"></i>
 		</div>
 

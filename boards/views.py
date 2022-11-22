@@ -2,13 +2,19 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import ListView, CreateView, FormView, DetailView
+from django.views.generic import ListView, CreateView, FormView, DetailView, UpdateView, DeleteView, TemplateView
+from django.db.models import Q
+from django.views.generic.edit import BaseUpdateView
 
 from .forms import BoardCreationForm
 from .models import Board, Card, Column
+
+
+class FavoriteView(TemplateView):
+    template_name = 'favorite.html'
 
 
 class BoardListView(ListView):
@@ -28,7 +34,7 @@ class BoardCreateView(CreateView):
     template_name = 'board_create.html'
 
     def post(self, request):
-        form = BoardCreationForm(request.POST)
+        form = BoardCreationForm(request.POST, request.FILES)
         if form.is_valid():
             board = Board.objects.create(
                 title=form.cleaned_data["title"],
@@ -36,7 +42,17 @@ class BoardCreateView(CreateView):
                 owner=request.user
             )
             board.save()
+            print(request, request.POST)
         return HttpResponseRedirect(reverse_lazy('board_index'))
+
+
+class BoardUpdateView(UpdateView):
+    model = Board
+    fields = ['title', 'background']
+    template_name = 'update_form.html'
+
+    def get_success_url(self):
+        return '/'
 
 
 def new_card(request):
@@ -57,8 +73,19 @@ def new_column(request, pk):
     return redirect('board_detail', pk)
 
 
+class CardDetailView(DetailView):
+    model = Card
+    template_name = 'card_detail.html'
+
+    def get_context_data(self, **kwargs ):
+        context = super().get_context_data(**kwargs)
+        context['current_card'] = Card.objects.get(id=kwargs['card_id']),
+        context['columns'] = Column.objects.all()
+        return context
+
+
 def view_card(request, card_id):
-    return render(request, template_name='view.html', context={
+    return render(request, template_name='card_detail.html', context={
         'columns': Column.objects.all(),
         'current_card': Card.objects.get(id=card_id),
     })
@@ -73,3 +100,42 @@ def drop(request):
     card.column = Column.objects.get(id=column_id)
     card.save()
     return HttpResponse()
+
+
+class BoardDeleteView(DeleteView):
+    model = Board
+    success_url = '/'
+    template_name = 'board_delete.html'
+
+
+class ColumnDeleteView(DeleteView):
+    model = Column
+    template_name = 'column_confirm_delete.html'
+
+    def get_success_url(self):
+        print(self.kwargs.values())
+        return reverse_lazy('board_index')
+
+
+class ColumnUpdateView(UpdateView):
+    model = Column
+    fields = ["title"]
+    template_name = 'column_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('board_index')
+
+
+def delete_card(request, card_id):
+    object_to_delete = get_object_or_404(Card, pk=card_id).delete()
+    return redirect('/')
+
+
+def update_card(request, card_id):
+    card = Card.objects.get(id=card_id)
+    template_name = 'card_update.html'
+    context = {
+        'card': card,
+    }
+    return render(request, template_name, context)
+

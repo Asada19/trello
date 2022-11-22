@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=4@q9e=ti_!s*q$3^uf86m#^r3os*1jmn_o-n%zt#_bh_ej_94
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'boards'
-
+    'boards',
+    'crispy_forms'
 ]
-
+CRISPY_TEMPLATE_PACK = 'uni_form'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -117,18 +117,13 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 
-SOCIAL_AUTH_GITHUB_KEY = '0cfaaede13038ee0a10c'
-SOCIAL_AUTH_GITHUB_SECRET = 'dee70a66e25ebafc8accc28bfbce47e019b3501f'
-
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "social_core.backends.github.GithubOAuth2",
     'social_core.backends.google.GoogleOAuth2',
-
 ]
 
 
@@ -147,11 +142,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+  os.path.join(BASE_DIR, 'static/'),
+)
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

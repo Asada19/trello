@@ -8,7 +8,6 @@
  <title>Trello</title>
  <script src="http://bensmithett.github.io/dragster/lib/dragster.js"></script>
  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
  <style>
  .no-display {
   display: none !important;
@@ -99,15 +98,30 @@
  </style>
  {% extends 'base.html' %}
  {% block board_content %}
+ <style>
+  body {
+ background-image: url({{ board.background.url }});
+   background-size: cover;
+}
+ </style>
 </head>
 <body>
+
 {% block content %}{% endblock %}
  <h2>{{ board.title }}</h2>
- <div class="board">
+  <div class="modal-body">
+    <button>
+    <a href="/{{ board.id }}/update">Edit</a>
+   </button>
+   <button>
+    <a href="/{{ board.id }}/delete">Delete</a>
+   </button>
+  </div>
 
+ <div class="board">
   {% for column in board.column.all %}
   <div class="column" data-column-id="{{ column.id }}">
-   <h3>{{ column.title }}</h3>
+    <h3>{{ column.title }}</h3>
 
    {% for card in column.cards.all %}
      <a class="card" draggable="true" data-card-id="{{ card.id }}" href="/cards/{{ card.id }}/">{{ card.title }}</a>
@@ -119,6 +133,12 @@
      <input type="text" name="title" class="new-card no-display" data-column-id="{{ column.id }}" />
     </form>
    <button class="show-new-card" data-column-id="{{ column.id }}">Add a card…</button>
+   <button>
+    <a href="/{{ column.id }}/update_column">Edit</a>
+   </button>
+   <button>
+    <a href="/{{ column.id }}/delete_column">Delete</a>
+   </button>
   </div>
   {% endfor %}
 
@@ -144,10 +164,10 @@
          const btnAddCol = document.getElementById("btn-add-col");
          btnAddCol.onclick = async () => {
           const modalResp = await Swal.fire({
-            title: 'Input email address',
+            title: 'Enter the column title',
             input: 'text',
-            inputLabel: 'Your email address',
-            inputPlaceholder: 'Enter your email address'
+            inputLabel: 'Column title',
+            inputPlaceholder: 'Column title'
           });
           if (modalResp.isConfirmed) {
 
@@ -176,7 +196,6 @@
           }
          for (button of document.getElementsByClassName('show-new-card')) {
              button.addEventListener('click', e => {
-
                  const newCard = document.querySelector('.new-card[data-column-id="' + e.currentTarget.dataset.columnId + '"]');
                  newCard.classList.remove('no-display');
                  e.currentTarget.classList.add('no-display');
@@ -231,4 +250,3 @@
 </body>
 </html>
 {% endblock %}
-
