@@ -3,14 +3,11 @@
 {% block page_content %}
 <h1>Favorites</h1>
 <div class="row">
-
     {% for board in boards %}
-        {% if board.owner == request.user and board.favorite == True %}
+        {% if board.owner == request.user and board in user.favorite %}
             <div class="card" style="width: 18rem;">
-                {% if board.background %}
+                {% if board.background %
                     <img class="card-img-top" src="{{ board.background.url }}"/>
-                {% else %}
-                    <P></P>
                 {% endif %}
                   <div class="card-body">
                     <h5 class="card-title">{{ board.title }}</h5>

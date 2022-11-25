@@ -33,16 +33,23 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'users',
     "social_django",
+    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account', # comma added
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'boards',
-    'crispy_forms'
 ]
 CRISPY_TEMPLATE_PACK = 'uni_form'
+
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -66,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -89,32 +97,38 @@ DATABASES = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    # },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "dashboard"
 
-# EMAIL_HOST = "localhost"
-# EMAIL_PORT = 1025
-
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {}
+}
 
 EMAIL_HOST = "smtp.gmail.com"
+DEFAULT_FROM_EMAIL = EMAIL_HOST
 EMAIL_HOST_USER = 'livencor@gmail.com'
 EMAIL_HOST_PASSWORD = 'gotpahdqsegcssoo'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+# EMAIL_USE_TLS = True
+
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com'
@@ -123,7 +137,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    'social_core.backends.google.GoogleOAuth2',
+    "social_core.backends.google.GoogleOAuth2",
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 

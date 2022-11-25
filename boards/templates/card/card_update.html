@@ -1,0 +1,17 @@
+<!-- entries/templates/entries/entry_form.html -->
+
+{% extends "base.html" %}
+{% block content %}
+
+    <form method="post">
+        {% csrf_token %}
+        <p><label for="id_subject">Title:</label>
+            <input id="id_subject" type="text" name="title" maxlength="100" placeholder="{{ card.title }}"></p>
+
+        <p><label for="id_message">Description:</label>
+            <textarea name="description" id="id_message" placeholder="{{ card.description }}"></textarea></p>
+
+        <button type="submit" content="Submit">Submit</button>
+    </form>
+
+{% endblock %}

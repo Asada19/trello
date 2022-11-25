@@ -1,10 +1,7 @@
-from django.urls import include, re_path, path
-
-from .views import dashboard, register
+from django.urls import include, path
+from .views import dashboard
 
 urlpatterns = [
-    path("", include("django.contrib.auth.urls")),
-    path("dashboard", dashboard, name="dashboard"),
-    path("oauth/", include("social_django.urls")),
-    path("register/", register, name="register"),
+    path('', include('allauth.urls')),
+    path("dashboard/", dashboard, name="dashboard"),
 ]

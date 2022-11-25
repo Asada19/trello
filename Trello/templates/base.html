@@ -4,18 +4,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Courgette:400,700">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
 <style>
-/*
-
-All grid code is placed in a 'supports' rule (feature query) at the bottom of the CSS (Line 320).
-
-The 'supports' rule will only run if your browser supports CSS grid.
-
-Flexbox is used as a fallback so that browsers which don't support grid will still recieve an identical layout.
-
-*/
-
-/* Base styles */
-
 :root {
     font-size: 10px;
 }
@@ -433,11 +421,11 @@ Remove or comment-out the code block below to see how the browser will fall-back
 
 </header>
 
-<div class="container">
     {% block page_content %}{% endblock %}
-</div>
 
-{% block board_content %}
+
+{% block content %}
 {% endblock %}
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+
