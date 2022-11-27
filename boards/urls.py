@@ -1,7 +1,9 @@
 from django.urls import path, re_path
 
 from .views import BoardListView, BoardCreateView, FavoriteView, BoardDetailView, BoardUpdateView, \
-    BoardDeleteView, new_column, ColumnUpdateView, CardUpdateView, new_card, view_card, CardDetailView
+    BoardDeleteView, new_column, ColumnUpdateView, CardUpdateView, new_card, view_card, CardDetailView, \
+    CardMarkCreateView, TitleChangeView, DescriptionChangeView, ChecklistCreateView, FileAddView, CardView, \
+    CommentCreateView, SearchView
 
 urlpatterns = [
     # Board
@@ -17,12 +19,22 @@ urlpatterns = [
     path('<int:pk>/delete_column/<int:column_id>/delete', ColumnUpdateView.delete, name="column_delete"),
     path('<int:pk>/update_column/<int:column_id>/update', ColumnUpdateView.as_view(), name="column_update"),
 
-    # Cards
-    path('card/<int:card_id>/', CardDetailView.as_view(), name='card_detail'),
-    path('card/<int:card_id>/update/', CardUpdateView.as_view(), name='card_update'),
-    path('card/<int:card_id>/delete/', CardUpdateView.delete, name='card_delete'),
-    path('drop/', CardUpdateView.drop),
-    path('new-card', new_card),
+    # Cards crud
+    path('new-card', new_card, name='card_create'),
+    path('card/<int:pk>/', CardView.as_view(), name='card_detail'),
+    path('card/<int:pk>/update/', CardUpdateView.as_view(), name='card_update'),
+    path('card/<int:pk>/delete/', CardView.delete, name='card_delete'),
+    path('drop/', CardView.drop, name='card_delete'),
+
+    # Card details
+    path("card/<int:pk>/mark/", CardMarkCreateView.as_view(), name="add_mark"),
+    path('card/<int:pk>/file/', FileAddView.as_view(), name='add_file'),
+    path('card/<int:pk>/checklist/', ChecklistCreateView.as_view(), name='add_checklist'),
+    path("card/<int:pk>/comment/", CommentCreateView.as_view(), name="card-comment-add"),
+    path("search/", SearchView.as_view(), name="search_results"),
+
+    # path('card/<int:card_id>/title/', TitleChangeView.as_view(), name='card_update_title'),
+    # path('card/<int:card_id>/description/', DescriptionChangeView.as_view(), name='card_update_description'),
     re_path(r'^cards/(?P<card_id>\d+)/', view_card),
 ]
 

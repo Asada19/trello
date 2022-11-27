@@ -1,15 +1,16 @@
 import json
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import get_template
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import ListView, CreateView, FormView, DetailView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 from django.views.generic.edit import FormMixin
 
-from .forms import BoardCreationForm, CommentForm, CardForm
-from .models import Board, Card, Column, Comment
+from .forms import BoardCreationForm, CommentForm, CardUpdateForm, MarkFormset
+from .models import Board, Card, Column, Comment, Mark, Checkpoint, Checklist, File
 
 
 class FavoriteView(TemplateView):
@@ -25,6 +26,21 @@ class BoardListView(ListView):
 class BoardDetailView(DetailView):
     model = Board
     template_name = 'board/board_detail.html'
+
+
+class CommentCreateView(CreateView):
+    model = Checklist
+    template_name = 'card/card_form.html'
+    fields = [
+        'checkpoint'
+    ]
+
+    def form_valid(self, form):
+        form.instance.card = Card.objects.get(id=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class BoardCreateView(CreateView):
@@ -73,37 +89,31 @@ def new_column(request, pk):
 
 class CardDetailView(DetailView, LoginRequiredMixin, FormMixin):
     model = Card
-    template_name = 'boards/card_detail.html'
+    template_name = 'card/card_detail.html'
     context_object_name = 'card'
     form_class = CommentForm
 
     def get_context_data(self, **kwargs):
         card = self.get_object()
         context = super().get_context_data(**kwargs)
+        context['board_id'] = card.bar.board.id
+        context['marks'] = Mark.objects.filter(card=card)
+        context['checklists'] = Checklist.objects.filter(card=card)
         context['comments'] = Comment.objects.filter(card=card)
+        context['files'] = File.objects.filter(card=card)
         context['form'] = self.get_form()
         return context
 
-    def post(self, request, **kwargs):
-        card = get_object_or_404(Card, id=kwargs['card_id'])
+    def post(self, request, pk):
+        card = get_object_or_404(Card, pk=pk)
         form = CommentForm(request.POST)
 
         if form.is_valid():
-            comment = Comment(
-                author=request.user,
-                text=form.cleaned_data["text"],
-                card=card
-            )
-            comment.save()
-        comments = Comment.objects.filter(card=card)
-        context = {
-            "card": card,
-            "card_title": card.title,
-            "card_description": card.description,
-            "comments": comments,
-            "form": form
-        }
-        return render(request, "card/card_detail.html", context)
+            obj = form.save(commit=False)
+            obj.card = card
+            obj.user = self.request.user
+            obj.save()
+            return redirect(reverse('card_detail', kwargs={'pk': pk}))
 
 
 def view_card(request, card_id):
@@ -153,10 +163,10 @@ class ColumnUpdateView(View):
         return HttpResponseRedirect(reverse('board_detail', args=(board.id, )))
 
 
-class CardUpdateView(View):
+class CardView(View):
 
     def get(self, request, **kwargs):
-        card = Card.objects.get(pk=kwargs['card_id'])
+        card = Card.objects.get(pk=kwargs['pk'])
         board = card.column.board
         template = get_template('card/card_update.html')
         context = {
@@ -165,30 +175,15 @@ class CardUpdateView(View):
         }
         return HttpResponse(template.render(context, request))
 
-    def post(self, request, **kwargs):
-        card = Card.objects.get(pk=kwargs['card_id'])
-        board = card.column.board
-        form = CardForm(request.POST)
-        card.title = request.POST['title']
-        # card.date_of_end = request.POST['date_of_end']
-        card.description = request.POST['description']
-        # # card.members = request.POST['member']
-        # # card.file = request.POST.get('file')
-        # card.comment = request.POST['comment']
-        # # card.mark = request.POST('mark')
-        # # card.check_list = request.POST.get('check_list')
-        card.save()
-        return HttpResponseRedirect(reverse('card_detail', args=(card.pk, )))
-
     def delete(self, **kwargs):
-        card = Card.objects.get(pk=kwargs['card_id'])
+        card = Card.objects.get(pk=kwargs['pk'])
         board = card.column.board
         card.delete()
         return HttpResponseRedirect(reverse('board_detail', args=(board.pk, )))
 
     def drop(request):
         payload = json.loads(request.body)
-        card_id = int(payload.get('card_id'))
+        card_id = int(payload.get('pk'))
         column_id = int(payload.get('column_id'))
         assert card_id and column_id
         card = Card.objects.get(id=card_id)
@@ -196,3 +191,93 @@ class CardUpdateView(View):
         card.save()
         return HttpResponse()
 
+
+class CardUpdateView(UpdateView):
+    model = Card
+    form_class = CardUpdateForm
+    context_object_name = 'card'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["success_url"] = self.get_success_url()
+        context["marks"] = MarkFormset(instance=self.get_object())
+        return context
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.get_object().pk})
+
+
+class CardMarkCreateView(CreateView):
+    model = Mark
+    form_class = Mark
+    template_name = 'card/card_form.html'
+
+    def form_valid(self, form):
+        form.instance.card = Card.objects.get(id=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+class ChecklistCreateView(CreateView):
+    model = Checkpoint
+    template_name = 'card/card_form.html'
+    fields = [
+        'task',
+    ]
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class TitleChangeView(CreateView):
+    model = Card
+    template_name = 'card/card_form.html'
+    fields = [
+        'title',
+    ]
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+class DescriptionChangeView(UpdateView):
+    model = Card
+    template_name = 'card/card_form.html'
+    fields = [
+        'description'
+    ]
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class FileAddView(CreateView):
+    model = Card
+    template_name = 'card/card_form.html'
+    fields = [
+        'files',
+    ]
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class SearchView(ListView):
+    model = Board
+    template_name = 'board/board_list.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        object_list = Board.objects.filter(
+            Q(title__icontains=query) & Q(members__id=self.request.user.pk)
+        )
+        return object_list

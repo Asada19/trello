@@ -8,7 +8,7 @@
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
 </head>
-
+{% extends 'base.html' %}
 <body class="p-3 m-0 border-0 bd-example">
 {% block content %}
 <section class="section is-small py-5 px-40">
@@ -20,27 +20,21 @@
                 <div class="user-email" style="align-items:center;"><label for="card-update">
                     <p class="mr-5 font-light rounded bg-gray px-1 py-0" style="align-items:center;">Update</p></label>
                     <input
-                            card_update
                             id="card-update"
+                            type="button"
                             onclick="location.href='{% url "card_update" card.id %}'"/>
                 </div>
                 <div class="user-email" style="align-items:center;"><label for="card-delete">
                     <p class="mr-5 font-light rounded bg-gray px-1 py-0" style="align-items:center;">Delete</p></label>
                     <input
-                            card_delete
                             id="card-delete"
+                            type="button"
                             onclick="location.href='{% url "card_delete" card.id %}'"/>
                 </div>
                 </p>
             </div>
             <div class="border-t border-gray-200">
                 <dl>
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Bar</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                            {{ card.bar.title }}
-                        </dd>
-                    </div>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">Title</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ card.title }}</dd>
@@ -52,9 +46,10 @@
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">Labels</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                            {% for mark in marks %}
-                            <p class="rounded text-white py-0.5 px-1 mx-1"
-                               style="display:inline-block;background-color:{{ mark.color }}">
+                            {% for label in labels %}
+                            <p style="display:inline-block;background-color:{{ label.color }}"
+                               class="rounded text-white py-0.5 px-1 mx-1">
+                                {{ label.title }}
                             </p>
                             {% endfor %}
                             <label for="card-label-add">
@@ -62,8 +57,8 @@
                                    style="display:inline-block;align-items:center;"> + new label </p></label>
                             <input
                                     id="card-label-add"
-                                    onclick="location.href=''"
-                                    type="button"/>
+                                    type="button"
+                                    onclick="location.href='{% url "add_mark" card.id %}'"/>
                         </dd>
                     </div>
 
@@ -71,8 +66,8 @@
                         <dt class="text-sm font-medium text-gray-500">Checklist</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                             {% for checklist in checklists %}
-                            <input id="{{ checklist.id }}" name="to-do" type="checkbox" value="done">
-                            <label for="{{ checklist.id }}">{{ checklist.content }}</label><br>
+                            <input type="checkbox" id="{{ checklist.id }}" name="to-do" value="done">
+                            <label for="{{ checklist.id }}">{{checklist.content}}</label><br>
                             {% endfor %}
 
                             <label for="card-checklist-add">
@@ -80,8 +75,8 @@
                                    style="display:inline-block;align-items:center;"> + add to-do </p></label>
                             <input
                                     id="card-checklist-add"
-                                    onclick="location.href=''"
-                                    type="button"/>
+                                    type="button"
+                                    onclick="location.href='{% url "add_checklist" card.id %}'"/>
                         </dd>
                     </div>
 
@@ -89,22 +84,22 @@
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">Attachments</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                            <ul class="divide-y divide-gray-200 rounded-md border border-gray-200" role="list">
+                            <ul role="list" class="divide-y divide-gray-200 rounded-md border border-gray-200">
                                 {% for file in files %}
                                 <li class="flex items-center justify-between py-3 pl-3 pr-4 text-sm">
                                     <div class="flex w-0 flex-1 items-center">
-                                        <svg aria-hidden="true"
-                                             class="h-5 w-5 flex-shrink-0 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path clip-rule="evenodd"
+                                        <svg class="h-5 w-5 flex-shrink-0 text-gray-400"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                             aria-hidden="true">
+                                            <path fill-rule="evenodd"
                                                   d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z"
-                                                  fill-rule="evenodd"/>
+                                                  clip-rule="evenodd"/>
                                         </svg>
                                         <span class="ml-2 w-0 flex-1 truncate">{{ file.file.name }}</span>
                                     </div>
                                     <div class="ml-4 flex-shrink-0">
-                                        <a class="font-medium text-indigo-600 hover:text-indigo-500"
-                                           href="{{ file.file.url }}">See</a>
+                                        <a href="{{ file.file.url }}"
+                                           class="font-medium text-indigo-600 hover:text-indigo-500">See</a>
                                     </div>
                                 </li>
                                 {% endfor %}
@@ -114,8 +109,8 @@
                                    style="display:inline-block;align-items:center;"> + new attachment </p></label>
                             <input
                                     id="card-file-add"
-                                    onclick="location.href=''"
-                                    type="button"/>
+                                    type="button"
+                                    onclick="location.href='{% url "add_file" card.id %}'"/>
                         </dd>
                     </div>
 
@@ -126,18 +121,19 @@
                             <form method="post">
                                 {% csrf_token %}
                                 <div class="form-group">
+                                    {{ form.author }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form.text }}
+                                    {{ form.body }}
                                 </div>
-                                <button class="btn btn-primary" type="submit">Submit</button>
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
-                            {% for comment in card.comment.all %}
+                            {% for comment in comments %}
                             <p>
-                                On {{ comment.created_on.date }}&nbsp;
-                                <b>{{ comment.author.email }}</b> wrote:
+                                On {{comment.created_on.date }}&nbsp;
+                                <b>{{ comment.user.email }}</b> wrote:
                             </p>
-                            <p>{{ comment.text }}</p>
+                            <p>{{ comment.body }}</p>
                             <hr>
                             {% endfor %}
                         </dd>

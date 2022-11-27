@@ -1,6 +1,7 @@
+from io import BytesIO
+from PIL import Image
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from colorfield.fields import ColorField
 from django.db import models
 from django.urls import reverse
 
@@ -8,7 +9,7 @@ from django.urls import reverse
 class Board(models.Model):
     title = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE)
-    background = models.ImageField(upload_to='background', blank=True)  # <--- сжатие изображений по двум праметрам: optimize и progressive
+    background = models.ImageField(upload_to='background', blank=True)
 
     def image_validator(self):
         valid_formats = ['png', 'jpeg', 'jpg']
@@ -17,6 +18,13 @@ class Board(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self):
+        image = Image.open(self.background)
+        img_output = BytesIO()
+        image.save(img_output, "JPEG", optimize=True, progressive=True, quality=40)  # <--- сжатие изображений по двум праметрам: optimize и progressive
+        self.background_img = File(img_output, name=self.background.name)
+        super().save()
 
 
 class Column(models.Model):
@@ -36,11 +44,7 @@ class Card(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     members = models.ManyToManyField(User, related_name='mark_card', blank=True)
-    file = models.FileField(upload_to='card_files', blank=True)
-    date_of_end = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['id']
+    date_of_end = models.DateTimeField()
 
     def get_absolute_url(self):
         return reverse('card_detail', args=[str(self.id)])
@@ -68,14 +72,8 @@ class Checkpoint(models.Model):
 
 
 class Mark(models.Model):
-
-    COLOR_PALETTE = [
-        ("#FFFFFF", "white",),
-        ("#000000", "black",),
-    ]
-
-    color = ColorField(samples=COLOR_PALETTE)
-    card = models.ForeignKey(Card, related_name='mark', on_delete=models.CASCADE)
+    card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='mark')
+    color = models.CharField(default='#000', max_length=7)
 
 
 class Archiwe(models.Model):
@@ -86,3 +84,11 @@ class Archiwe(models.Model):
 class Favorite(models.Model):
     space = models.JSONField()
     owner = models.OneToOneField(User, related_name='favorite', on_delete=models.CASCADE)
+
+
+class File(models.Model):
+    card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='card_files/')
+
+    def __str__(self):
+        return self.file
