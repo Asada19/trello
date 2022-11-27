@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <meta content="" name="description">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Trello</title>
-    <script src="http://bensmithett.github.io/dragster/lib/dragster.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="http://bensmithett.github.io/dragster/lib/dragster.js"></script>
     <style>
         .no-display {
             display: none !important;
@@ -114,12 +114,12 @@
     {% extends 'base.html' %}
     {% block content %}
     {% if board.background %}
-        <style>
-            body {
-                background-image: url({{ board.background.url }});
-                background-size: cover;
-            }
-        </style>
+    <style>
+        body {
+            background-image: url({{ board.background.url }});
+            background-size: cover;
+        }
+    </style>
     {% endif %}
 </head>
 <body>
@@ -140,13 +140,13 @@
         <h3>{{ column.title }}</h3>
 
         {% for card in column.cards.all %}
-        <a class="card" draggable="true" data-card-id="{{ card.id }}" href="/cards/{{ card.id }}/">{{ card.title }}</a>
+        <a class="card" data-card-id="{{ card.id }}" draggable="true" href="/cards/{{ card.id }}/">{{ card.title }}</a>
         {% endfor %}
 
-        <form action="/new-card/" method="POST">
+        <form action="/new-card" method="POST">
             {% csrf_token %}
-            <input type="hidden" name="column_id" value="{{ column.id }}"/>
-            <input type="text" name="title" class="new-card no-display" data-column-id="{{ column.id }}"/>
+            <input name="column_id" type="hidden" value="{{ column.id }}"/>
+            <input class="new-card no-display" data-column-id="{{ column.id }}" name="title" type="text"/>
         </form>
         <button class="show-new-card" data-column-id="{{ column.id }}">Add a card…</button>
         <button>
@@ -158,7 +158,7 @@
     </div>
     {% endfor %}
 
-    <button id="btn-add-col" type="button" class="btn btn-outline-light">➕</button>
+    <button class="btn btn-outline-light" id="btn-add-col" type="button">➕</button>
 </div>
 
 <script>
@@ -190,9 +190,9 @@
 
             const formData = {
                 title: modalResp.value,
-                board_id: "{{board.id}}"
+                board_id: "{{ board.id }}"
             };
-            fetch('/{{ board.pk }}/new-column/', {
+            fetch('/{{ board.pk }}/new_column', {
                     credentials: 'same-origin',
                     method: 'post',
                     headers: {
@@ -227,9 +227,9 @@
 
     for (element of document.getElementsByClassName('column')) {
         new Dragster(element);
-                element.addEventListener('dragover', e => {
-                    if (e.preventDefault) e.preventDefault();
-                });
+        element.addEventListener('dragover', e => {
+            if (e.preventDefault) e.preventDefault();
+        });
         element.addEventListener('dragster:enter', e => {
             e.currentTarget.classList.add('dropme')
         });

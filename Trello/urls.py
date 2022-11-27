@@ -21,8 +21,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("user", include("users.urls")),
+    path("accounts/", include("users.urls")),
     path("", include("boards.urls")),
-    path("oauth/", include("social_django.urls"))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

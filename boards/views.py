@@ -1,12 +1,14 @@
 import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import get_template
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import ListView, CreateView, FormView, DetailView, UpdateView, DeleteView, TemplateView
-from .forms import BoardCreationForm, CommentForm
+from django.views.generic.edit import FormMixin
+
+from .forms import BoardCreationForm, CommentForm, CardForm
 from .models import Board, Card, Column, Comment
 
 
@@ -69,15 +71,39 @@ def new_column(request, pk):
     return redirect('board_detail', pk)
 
 
-class CardDetailView(DetailView):
+class CardDetailView(DetailView, LoginRequiredMixin, FormMixin):
     model = Card
-    template_name = 'card/card_detail.html'
+    template_name = 'boards/card_detail.html'
+    context_object_name = 'card'
+    form_class = CommentForm
 
-    def get_context_data(self, **kwargs ):
+    def get_context_data(self, **kwargs):
+        card = self.get_object()
         context = super().get_context_data(**kwargs)
-        context['current_card'] = Card.objects.get(id=kwargs['card_id']),
-        context['columns'] = Column.objects.all()
+        context['comments'] = Comment.objects.filter(card=card)
+        context['form'] = self.get_form()
         return context
+
+    def post(self, request, **kwargs):
+        card = get_object_or_404(Card, id=kwargs['card_id'])
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            comment = Comment(
+                author=request.user,
+                text=form.cleaned_data["text"],
+                card=card
+            )
+            comment.save()
+        comments = Comment.objects.filter(card=card)
+        context = {
+            "card": card,
+            "card_title": card.title,
+            "card_description": card.description,
+            "comments": comments,
+            "form": form
+        }
+        return render(request, "card/card_detail.html", context)
 
 
 def view_card(request, card_id):
@@ -142,16 +168,17 @@ class CardUpdateView(View):
     def post(self, request, **kwargs):
         card = Card.objects.get(pk=kwargs['card_id'])
         board = card.column.board
+        form = CardForm(request.POST)
         card.title = request.POST['title']
-        # card.members = request.POST.get('members')
-        # card.date_of_end = request.POST.get('date_of_end')
-        card.description = request.POST['title']
-        # card.file = request.POST.get('file')
-        # card.comment = request.POST.get('comment')
-        # card.mark = request.POST('mark')
-        # card.check_list = request.POST.get('check_list')
+        # card.date_of_end = request.POST['date_of_end']
+        card.description = request.POST['description']
+        # # card.members = request.POST['member']
+        # # card.file = request.POST.get('file')
+        # card.comment = request.POST['comment']
+        # # card.mark = request.POST('mark')
+        # # card.check_list = request.POST.get('check_list')
         card.save()
-        return HttpResponseRedirect(reverse('board_detail', args=(board.pk, )))
+        return HttpResponseRedirect(reverse('card_detail', args=(card.pk, )))
 
     def delete(self, **kwargs):
         card = Card.objects.get(pk=kwargs['card_id'])
@@ -169,27 +196,3 @@ class CardUpdateView(View):
         card.save()
         return HttpResponse()
 
-
-class CardDetailView(LoginRequiredMixin, FormView, DetailView):
-    model = Card
-    context_object_name = 'card'
-    template_name = 'card/card_detail.html'
-    form_class = CommentForm
-    success_url = '#'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['comments'] = Comment.objects.filter(card=self.get_object()).order_by('-created_on')
-        context['form'] = CommentForm()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = Comment(
-                text=form.cleaned_data['text'],
-                card=self.get_object(),
-                author=self.request.user
-            )
-            comment.save()
-        return super().form_valid(form)

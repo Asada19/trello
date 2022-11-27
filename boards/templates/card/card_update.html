@@ -1,17 +1,24 @@
-<!-- entries/templates/entries/entry_form.html -->
-
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-
-    <form method="post">
-        {% csrf_token %}
-        <p><label for="id_subject">Title:</label>
-            <input id="id_subject" type="text" name="title" maxlength="100" placeholder="{{ card.title }}"></p>
-
-        <p><label for="id_message">Description:</label>
-            <textarea name="description" id="id_message" placeholder="{{ card.description }}"></textarea></p>
-
-        <button type="submit" content="Submit">Submit</button>
-    </form>
-
+<div class="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-md space-y-8">
+    <div>
+<form method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input
+            value="Submit"
+            type="submit">
+    <input
+            value="Cancel"
+            type="button"
+            onclick="location.href='{{ success_url }}'">
+</form>
+    </div>
+  </div>
+</div>
 {% endblock %}

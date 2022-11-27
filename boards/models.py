@@ -50,9 +50,10 @@ class Card(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(Card, related_name='commentaries', on_delete=models.CASCADE)
     card = models.ForeignKey(Card, related_name='comment', on_delete=models.CASCADE)
-    text = models.TextField(blank=True)
+    text = models.TextField(blank=True, max_length=300)
+    created_on = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Checklist(models.Model):

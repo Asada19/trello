@@ -1,5 +1,7 @@
 from django import forms
-from .models import Card, Board
+from django.forms import DateTimeInput
+
+from .models import Card, Board, Comment
 
 
 class BoardCreationForm(forms.ModelForm):
@@ -20,11 +22,16 @@ class CardCreationForm(forms.ModelForm):
         fields = ['title']
 
 
-class CommentForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea(attrs={
-        'class': 'form-control',
-        'placeholder': 'Leave a comment'
-    }))
+# class CommentForm(forms.Form):
+#     text = forms.CharField(widget=forms.Textarea(attrs={
+#         'class': 'form-control',
+#         'placeholder': 'Leave a comment'
+#     }))
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('text',)
 
 
 class CardForm(forms.ModelForm):
@@ -37,3 +44,11 @@ class SearchForm(forms.Form):
     user = forms.CharField(label='Search user', max_length=250)
     mark = forms.CharField(label='Search mark', max_length=250)
 
+
+class CardUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Card
+        fields = ('bar', 'title', 'description', 'deadline')
+        widgets = {
+            'deadline': DateTimeInput(attrs={"type": "datetime-local", })
+        }
