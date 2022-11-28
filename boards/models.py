@@ -8,8 +8,10 @@ from django.urls import reverse
 
 class Board(models.Model):
     title = models.CharField(max_length=256)
-    owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE, null=True)
     background = models.ImageField(upload_to='background', blank=True)
+
+    members = models.ManyToManyField(to=User, related_name='boards')
 
     def image_validator(self):
         valid_formats = ['png', 'jpeg', 'jpg']
@@ -92,3 +94,4 @@ class File(models.Model):
 
     def __str__(self):
         return self.file
+

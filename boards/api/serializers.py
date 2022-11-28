@@ -1,31 +1,53 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from ..models import Board, Column, Card
 
-from Trello.boards import models
-from Trello.boards.models import Board
+
+# class CommentSerializer(serializers.Serializer):
+#     text = serializers.TextField(blank=True, max_length=300)
+#     created_on = serializers.DateTimeField(auto_now_add=True)
+#
+#
+# class CardSerializer(serializers.Serializer):
+#     # comment = serializers.StringRelatedField(CommentSerializer)
+#
+#     column = serializers.StringRelatedField(Column, related_name='cards')
+#     title = serializers.CharField(max_length=255)
+#     description = serializers.StringRelatedField(blank=True)
+#     members = serializers.StringRelatedField(related_name='mark_card', blank=True)
+#     date_of_end = serializers.StringRelatedField(auto_now=True)
+
+
+#
+#
+
+class ColumnSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=30)
+    # card = serializers.StringRelatedField(many=True)
+
+    def create(self, validated_data):
+        return ColumnSerializer(**validated_data).save()
+
+
+class BoardDetailSerializer(serializers.Serializer):
+
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=50, required=False)
+    background = serializers.ImageField(required=False)
+    column = serializers.StringRelatedField(many=True, read_only=True)
 
 
 class BoardSerializer(serializers.Serializer):
-
-    title = serializers.CharField(max_length=256)
-    owner = serializers.ForeignKey(User, related_name='Board', on_delete=models.CASCADE)
-    background = serializers.ImageField(upload_to='background', blank=True)
-
-    def image_validator(self):
-        valid_formats = ['png', 'jpeg', 'jpg']
-        if not any([True if self.background.name.endswith(i) else False for i in valid_formats]):
-            raise ValidationError(f'{self.background.name} is not a valid image format')
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=30)
+    background = serializers.ImageField(required=False)
 
     def create(self, validated_data):
         board = Board(
             title=validated_data['title'],
-            background=validated_data['background']
+            background=validated_data['background'],
         )
-
-    def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.background = validated_data.get('background', instance.background)
-        instance.save()
-        return instance
-
+        board.save()
+        return board

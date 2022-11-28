@@ -154,6 +154,17 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+#
+# REST_FRAMEWORK = {
+#
+#     'TEST_REQUEST_RENDERER_CLASSES': [
+#         'rest_framework.renderers.MultiPartRenderer',
+#         'rest_framework.renderers.JSONRenderer',
+#         'rest_framework.renderers.TemplateHTMLRenderer'
+#     ]
+#
+# }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
