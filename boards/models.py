@@ -10,8 +10,9 @@ class Board(models.Model):
     title = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE, null=True)
     background = models.ImageField(upload_to='background', blank=True)
-
     members = models.ManyToManyField(to=User, related_name='boards')
+    is_active = models.BooleanField(default=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def image_validator(self):
         valid_formats = ['png', 'jpeg', 'jpg']
@@ -76,6 +77,7 @@ class Checkpoint(models.Model):
 class Mark(models.Model):
     card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='mark')
     color = models.CharField(default='#000', max_length=7)
+    title = models.CharField(blank=True, max_length=30)
 
 
 class Archiwe(models.Model):
