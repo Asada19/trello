@@ -21,7 +21,7 @@ urlpatterns = [
 
     # Cards crud
     path('new-card', new_card, name='card_create'),
-    path('card/<int:pk>/', CardView.as_view(), name='card_detail'),
+    path('card/<int:pk>/', CardDetailView.as_view(), name='card_detail'),
     path('card/<int:pk>/update/', CardUpdateView.as_view(), name='card_update'),
     path('card/<int:pk>/delete/', CardView.delete, name='card_delete'),
     path('drop/', CardView.drop, name='card_delete'),
@@ -31,7 +31,7 @@ urlpatterns = [
     path('card/<int:pk>/file/', FileAddView.as_view(), name='add_file'),
     path('card/<int:pk>/checklist/', ChecklistCreateView.as_view(), name='add_checklist'),
     path("card/<int:pk>/comment/", CommentCreateView.as_view(), name="card-comment-add"),
-    path("search/", SearchView.as_view(), name="search_results"),
+    path("search/", SearchView.as_view(), name="search"),
 
     # path('card/<int:card_id>/title/', TitleChangeView.as_view(), name='card_update_title'),
     # path('card/<int:card_id>/description/', DescriptionChangeView.as_view(), name='card_update_description'),

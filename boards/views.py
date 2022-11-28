@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 from django.views.generic.edit import FormMixin
 
-from .forms import BoardCreationForm, CommentForm, CardUpdateForm, MarkFormset
+from .forms import BoardCreationForm, CommentForm, CardUpdateForm, MarkFormset, MarkForm
 from .models import Board, Card, Column, Comment, Mark, Checkpoint, Checklist, File
 
 
@@ -19,13 +19,13 @@ class FavoriteView(TemplateView):
 
 class BoardListView(ListView):
     model = Board
-    template_name = 'board/board_index.html'
+    template_name = 'boards/board_index.html'
     context_object_name = 'boards'
 
 
 class BoardDetailView(DetailView):
     model = Board
-    template_name = 'board/board_detail.html'
+    template_name = 'boards/board_detail.html'
 
 
 class CommentCreateView(CreateView):
@@ -46,7 +46,7 @@ class CommentCreateView(CreateView):
 class BoardCreateView(CreateView):
     model = Board
     form_class = BoardCreationForm
-    template_name = 'board/board_create.html'
+    template_name = 'boards/board_create.html'
 
     def post(self, request):
         form = BoardCreationForm(request.POST, request.FILES)
@@ -63,7 +63,7 @@ class BoardCreateView(CreateView):
 class BoardUpdateView(UpdateView):
     model = Board
     fields = ['title', 'background']
-    template_name = 'board/update_form.html'
+    template_name = 'boards//update_form.html'
 
     def get_success_url(self):
         return '/'
@@ -96,7 +96,6 @@ class CardDetailView(DetailView, LoginRequiredMixin, FormMixin):
     def get_context_data(self, **kwargs):
         card = self.get_object()
         context = super().get_context_data(**kwargs)
-        context['board_id'] = card.bar.board.id
         context['marks'] = Mark.objects.filter(card=card)
         context['checklists'] = Checklist.objects.filter(card=card)
         context['comments'] = Comment.objects.filter(card=card)
@@ -111,7 +110,7 @@ class CardDetailView(DetailView, LoginRequiredMixin, FormMixin):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.card = card
-            obj.user = self.request.user
+            obj.author = self.request.user
             obj.save()
             return redirect(reverse('card_detail', kwargs={'pk': pk}))
 
@@ -126,12 +125,12 @@ def view_card(request, card_id):
 class BoardDeleteView(DeleteView):
     model = Board
     success_url = '/'
-    template_name = 'board/board_delete.html'
+    template_name = 'boards/board_delete.html'
 
 
 class ColumnDeleteView(DeleteView):
     model = Column
-    template_name = 'board/column_confirm_delete.html'
+    template_name = 'boards/column_confirm_delete.html'
 
     def get_success_url(self):
         print(self.kwargs.values())
@@ -142,7 +141,7 @@ class ColumnUpdateView(View):
     def get(self, request, **kwargs):
         board = Board.objects.get(pk=kwargs['pk'])
         column = Column.objects.get(pk=kwargs['column_id'])
-        template = get_template('board/column_update.html')
+        template = get_template('boards/column_update.html')
         context = {
             "board": board,
             "column": column
@@ -204,12 +203,13 @@ class CardUpdateView(UpdateView):
         return context
 
     def get_success_url(self):
-        return reverse('card_detail', kwargs={'pk': self.get_object().pk})
+        card = self.object
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class CardMarkCreateView(CreateView):
     model = Mark
-    form_class = Mark
+    form_class = MarkForm
     template_name = 'card/card_form.html'
 
     def form_valid(self, form):
@@ -221,15 +221,18 @@ class CardMarkCreateView(CreateView):
 
 
 class ChecklistCreateView(CreateView):
-    model = Checkpoint
+    model = Checklist
     template_name = 'card/card_form.html'
     fields = [
-        'task',
+        'title'
     ]
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
+        form.instance.card = Card.objects.get(id=self.kwargs['pk'])
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class TitleChangeView(CreateView):
@@ -260,24 +263,27 @@ class DescriptionChangeView(UpdateView):
 
 
 class FileAddView(CreateView):
-    model = Card
+    model = File
     template_name = 'card/card_form.html'
     fields = [
-        'files',
+        'file',
     ]
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
+        form.instance.card = Card.objects.get(id=self.kwargs['pk'])
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('card_detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class SearchView(ListView):
     model = Board
-    template_name = 'board/board_list.html'
+    template_name = 'boards/board_index.html'
 
     def get_queryset(self):
         query = self.request.GET.get("q")
         object_list = Board.objects.filter(
-            Q(title__icontains=query) & Q(members__id=self.request.user.pk)
+            Q(title__icontains=query)
         )
         return object_list

@@ -1,4 +1,4 @@
-{% extends 'board/board_detail.html' %}
+{% extends 'boards/board_detail.html' %}
 {% block content %}
 {% load crispy_forms_tags %}
 <style>
@@ -62,9 +62,11 @@
 <div class="customs" display="flex">
     <div class="card-detail">
         <div class="card-header">
-            <form method="post">{% csrf_token %}
-                <p>Are you sure you want to delete "{{ object }}"?</p>
-                <input type="submit" value="Confirm">
+            <h1>Update Board</h1>
+            <form enctype='multipart/form-data' method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input onclick="window.history.back()" type="submit" value="Submit">
             </form>
             <button onclick="window.history.back()" type="button">✕</button>
         </div>

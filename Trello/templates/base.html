@@ -390,7 +390,7 @@ Remove or comment-out the code block below to see how the browser will fall-back
 		<button class="boards-btn btn" onclick="location.href='{% url "board_index" %}'"><i class="fab fa-trello boards-btn-icon" href="{% url 'board_index' %}"></i>Boards</button>
 
 		<div class="board-search" action="" method="get">
-			<form>
+			<form action="{% url 'search' %}" method="get">
 				<input name="q" type="text" class="board-search-input" aria-label="Board Search">
 			</form>
 			<i class="fas fa-search search-icon" aria-hidden="true"></i>

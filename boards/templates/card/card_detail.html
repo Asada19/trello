@@ -44,17 +44,16 @@
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ card.description }}</dd>
                     </div>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Labels</dt>
+                        <dt class="text-sm font-medium text-gray-500">Marks</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                            {% for label in labels %}
-                            <p style="display:inline-block;background-color:{{ label.color }}"
+                            {% for mark in marks %}
+                            <p style="border: {{ mark.color }}; width: 100px; height: 20px;background-color:{{ mark.color }}"
                                class="rounded text-white py-0.5 px-1 mx-1">
-                                {{ label.title }}
                             </p>
                             {% endfor %}
                             <label for="card-label-add">
                                 <p class="rounded text-white py-0.1 px-1 mx-1 my-0.5 bg-zinc-500"
-                                   style="display:inline-block;align-items:center;"> + new label </p></label>
+                                   style="display:inline-block;align-items:center;"> + new mark </p></label>
                             <input
                                     id="card-label-add"
                                     type="button"
@@ -67,7 +66,7 @@
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                             {% for checklist in checklists %}
                             <input type="checkbox" id="{{ checklist.id }}" name="to-do" value="done">
-                            <label for="{{ checklist.id }}">{{checklist.content}}</label><br>
+                            <label for="{{ checklist.id }}">{{checklist.title}}</label><br>
                             {% endfor %}
 
                             <label for="card-checklist-add">
@@ -82,7 +81,7 @@
 
 
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Attachments</dt>
+                        <dt class="text-sm font-medium text-gray-500">Linked files</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                             <ul role="list" class="divide-y divide-gray-200 rounded-md border border-gray-200">
                                 {% for file in files %}
@@ -124,7 +123,7 @@
                                     {{ form.author }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form.body }}
+                                    {{ form.text }}
                                 </div>
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
@@ -133,7 +132,7 @@
                                 On {{comment.created_on.date }}&nbsp;
                                 <b>{{ comment.user.email }}</b> wrote:
                             </p>
-                            <p>{{ comment.body }}</p>
+                            <p>{{ comment.text }}</p>
                             <hr>
                             {% endfor %}
                         </dd>

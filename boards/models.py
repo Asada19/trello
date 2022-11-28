@@ -16,15 +16,14 @@ class Board(models.Model):
         if not any([True if self.background.name.endswith(i) else False for i in valid_formats]):
             raise ValidationError(f'{self.background.name} is not a valid image format')
 
+    def save(self, *args, **kwargs):
+        super(Board, self).save(*args, **kwargs)
+        img = Image.open(self.background.path)
+        if img.height > 300 or img.width > 300:
+            img.save(self.background.path, quality=20, optimize=True)
+
     def __str__(self):
         return self.title
-
-    def save(self):
-        image = Image.open(self.background)
-        img_output = BytesIO()
-        image.save(img_output, "JPEG", optimize=True, progressive=True, quality=40)  # <--- сжатие изображений по двум праметрам: optimize и progressive
-        self.background_img = File(img_output, name=self.background.name)
-        super().save()
 
 
 class Column(models.Model):
@@ -44,7 +43,7 @@ class Card(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     members = models.ManyToManyField(User, related_name='mark_card', blank=True)
-    date_of_end = models.DateTimeField()
+    date_of_end = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         return reverse('card_detail', args=[str(self.id)])
@@ -54,15 +53,16 @@ class Card(models.Model):
 
 
 class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, related_name='comment', on_delete=models.CASCADE)
     text = models.TextField(blank=True, max_length=300)
-    created_on = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
 
 
 class Checklist(models.Model):
     title = models.CharField(max_length=30)
     card = models.ForeignKey(Card, related_name='check_list', on_delete=models.CASCADE)
+    is_done = models.BooleanField(default=False)
 
 
 class Checkpoint(models.Model):
@@ -88,7 +88,7 @@ class Favorite(models.Model):
 
 class File(models.Model):
     card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='files')
-    file = models.FileField(upload_to='card_files/')
+    file = models.FileField(upload_to='Files/')
 
     def __str__(self):
         return self.file
