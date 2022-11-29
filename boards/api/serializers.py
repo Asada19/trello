@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import Board, Column, Card
+from ..models import Board, Column, Card, Favorite
 
 
 class FileSerializer(serializers.Serializer):
@@ -38,6 +38,7 @@ class MarkSerializer(serializers.Serializer):
         return instance
 
 
+
 class CommentSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     text = serializers.CharField(max_length=300)
@@ -57,10 +58,22 @@ class CardSerializer(serializers.Serializer):
     def create(self, validated_data):
         return CardSerializer(**validated_data).save()
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['comment'] = CommentSerializer(instance.comment.all(), many=True, context=self.context).data
+        representation['files'] = FileSerializer(instance.files.all(), many=True, context=self.context).data
+        representation['mark'] = MarkSerializer(instance.mark.all(), many=True, context=self.context).data
+        return representation
+
 
 class ColumnSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=30, required=False)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['cards'] = CardSerializer(instance.cards.all(), many=True, context=self.context).data
+        return representation
 
     def update(self, instance, validated_data):
         instance.title = validated_data["title"]
@@ -69,6 +82,7 @@ class ColumnSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return ColumnSerializer(**validated_data).save()
+
 
 
 class BoardDetailSerializer(serializers.Serializer):
@@ -86,6 +100,11 @@ class BoardDetailSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['column'] = ColumnSerializer(instance.column.all(), many=True, context=self.context).data
+        return representation
+
 
 class BoardSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -99,3 +118,20 @@ class BoardSerializer(serializers.Serializer):
         )
         board.save()
         return board
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['column'] = ColumnSerializer(instance.column.all(), many=True, context=self.context).data
+        return representation
+
+
+class FavoriteSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    board = serializers.IntegerField()
+    owner = serializers.IntegerField()
+
+    def create(self, validated_data):
+        return FavoriteSerializer(**validated_data).save()
+
+
+

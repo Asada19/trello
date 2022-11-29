@@ -5,8 +5,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import BoardSerializer, BoardDetailSerializer, ColumnSerializer, CardSerializer, MarkSerializer, \
-    CommentSerializer, FileSerializer, ChecklistSerializer
-from ..models import Board, Column, Card, Mark, Comment, File, Checklist
+    CommentSerializer, FileSerializer, ChecklistSerializer, FavoriteSerializer
+from ..models import Board, Column, Card, Mark, Comment, File, Checklist, Favorite
 
 
 class BoardAPIView(APIView):
@@ -402,4 +402,24 @@ class Archive(APIView):
         serializer = BoardSerializer(queryset, many=True)
         return Response(serializer.data)
 
+
+class FavoriteView(APIView):
+
+    def post(self, request, board_pk):
+        board = Board.objects.filter(pk=board_pk)
+        if board:
+            object = Favorite(
+                owner=request.user,
+                board=board[0],
+            )
+            object.save()
+            return Response('successful added', status=status.HTTP_201_CREATED)
+        return Response('object does not exists', status=status.HTTP_400_BAD_REQUEST)
+
+
+class FavoriteListView(APIView):
+    def get(self, request):
+        queryset = Favorite.objects.all()
+        serializer = FavoriteSerializer(queryset, many=True)
+        return Response(serializer.data)
 

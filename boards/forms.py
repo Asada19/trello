@@ -45,7 +45,7 @@ class CardUpdateForm(forms.ModelForm):
 class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
-        fields = ('color',)
+        fields = ('color', 'title')
         widgets = {
             'color': TextInput(attrs={"type": "color", })
         }
