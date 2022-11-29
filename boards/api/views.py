@@ -1,10 +1,12 @@
+import datetime
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import BoardSerializer, BoardDetailSerializer, ColumnSerializer, CardSerializer
-from ..models import Board, Column, Card
+from .serializers import BoardSerializer, BoardDetailSerializer, ColumnSerializer, CardSerializer, MarkSerializer, \
+    CommentSerializer, FileSerializer, ChecklistSerializer
+from ..models import Board, Column, Card, Mark, Comment, File, Checklist
 
 
 class BoardAPIView(APIView):
@@ -44,7 +46,7 @@ class BoardDetailView(APIView):
     def patch(self, request, pk):
         board = self.get_object(pk)
         serializer = BoardDetailSerializer(board, data=request.data, partial=True)
-        if serializer:
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -85,6 +87,7 @@ class ColumnAPIView(APIView):
 
 
 class ColumnDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
     @swagger_auto_schema(operation_summary="column get method")
     def get(self, request, column_id):
@@ -141,6 +144,7 @@ class CardAPIView(APIView):
 
 
 class CardDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_object(self, card_id):
         return Card.objects.get(pk=card_id)
@@ -171,3 +175,220 @@ class CardDetailView(APIView):
             return Response('card successfully deleted', status=status.HTTP_204_NO_CONTENT)
         else:
             return Response('Board not found', status=status.HTTP_404_NOT_FOUND)
+
+
+class MarkAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    @swagger_auto_schema(operation_summary="column list method")
+    def get(self, requset, card_id):
+        card = Card.objects.get(pk=card_id)
+        marks = card.mark.all()
+        serializer = CardSerializer(marks, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=MarkSerializer, operation_summary='Creates a new Mark Object')
+    def post(self, request, card_id):
+        data = request.data
+        card = Card.objects.get(pk=card_id)
+        serializer = MarkSerializer(data=data)
+        if serializer.is_valid():
+            mark = Mark(
+                title=request.data['title'],
+                color=request.data['color']
+            )
+            mark.card = card
+            mark.save()
+            return Response('mark successful created', status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MarkDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self, mark_id):
+        return Card.objects.get(pk=mark_id)
+
+    @swagger_auto_schema(operation_summary="mark get method")
+    def get(self, request, mark_id):
+        mark = self.get_object(mark_id)
+        if mark:
+            serializer = MarkSerializer(mark)
+            return Response(serializer.data)
+        else:
+            return Response('mark does not exists', status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(request_body=MarkSerializer, operation_summary="update method")
+    def patch(self, request, mark_id):
+        mark = self.get_object(mark_id)
+        serializer = MarkSerializer(mark, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(operation_summary="delete method")
+    def delete(self, request, mark_id):
+        mark = self.get_object(mark_id)
+        if mark:
+            mark.delete()
+            return Response('mark successfully deleted', status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response('Mark not found', status=status.HTTP_404_NOT_FOUND)
+
+
+class CommentAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    @swagger_auto_schema(operation_summary="comment list method")
+    def get(self, requset, card_id):
+        card = Card.objects.get(pk=card_id)
+        comment = card.comment.all()
+        serializer = CommentSerializer(comment, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=CommentSerializer, operation_summary='Creates a new Comment Object')
+    def post(self, request, card_id):
+        data = request.data
+        card = Card.objects.get(pk=card_id)
+        serializer = CommentSerializer(data=data)
+        if serializer.is_valid():
+            comment = Comment(
+                text=request.data['text'],
+            )
+            comment.created_on = datetime.datetime.now()
+            comment.author = request.user
+            comment.card = card
+            comment.save()
+            return Response('comment successful created', status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self, comment_id):
+        return Comment.objects.get(pk=comment_id)
+
+    @swagger_auto_schema(operation_summary="comment get method")
+    def get(self, request, comment_id):
+        comment = self.get_object(comment_id)
+        if comment:
+            serializer = CommentSerializer(comment)
+            return Response(serializer.data)
+        else:
+            return Response('mark does not exists', status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(operation_summary="delete method")
+    def delete(self, request, comment_id):
+        comment = self.get_object(comment_id)
+        if comment:
+            comment.delete()
+            return Response('comment successfully deleted', status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response('Mark not found', status=status.HTTP_404_NOT_FOUND)
+
+
+class FileAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    @swagger_auto_schema(operation_summary="file list method")
+    def get(self, requset, card_id):
+        card = Card.objects.get(pk=card_id)
+        files = card.files.all()
+        serializer = FileSerializer(files, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=FileSerializer, operation_summary='Creates a new Comment Object')
+    def post(self, request, card_id):
+        data = request.data
+        card = Card.objects.get(pk=card_id)
+        serializer = FileSerializer(data=data)
+        if serializer.is_valid():
+            file = serializer.save()
+            file.card = card
+            file.save()
+            return Response('comment successful created', status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FileDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self, file_id):
+        return Comment.objects.get(pk=file_id)
+
+    @swagger_auto_schema(operation_summary="file get method")
+    def get(self, request, file_id):
+        file = self.get_object(file_id)
+        if file:
+            serializer = CommentSerializer(file)
+            return Response(serializer.data)
+        else:
+            return Response('mark does not exists', status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(operation_summary="file delete method")
+    def delete(self, request, file_id):
+        file = self.get_object(file_id)
+        if file:
+            file.delete()
+            return Response('comment successfully deleted', status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response('Mark not found', status=status.HTTP_404_NOT_FOUND)
+
+
+class ChecklistAPIView(APIView):
+    @swagger_auto_schema(operation_summary="check_list list method")
+    def get(self, requset, card_id):
+        card = Card.objects.get(pk=card_id)
+        check_list = card.check_list.all()
+        serializer = CommentSerializer(check_list, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=ChecklistSerializer, operation_summary='Creates a new chek_list Object')
+    def post(self, request, card_id):
+        data = request.data
+        card = Card.objects.get(pk=card_id)
+        serializer = ChecklistSerializer(data=data)
+        if serializer.is_valid():
+            check_list = Checklist(
+                title=request.data['title'],
+            )
+            check_list.card = card
+            check_list.save()
+            return Response('comment successful created', status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChecklistDetailView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self, check_id):
+        return Comment.objects.get(pk=check_id)
+
+    @swagger_auto_schema(operation_summary="check_list get method")
+    def get(self, request, check_id):
+        check_list = self.get_object(check_id)
+        if check_list:
+            serializer = ChecklistSerializer(check_list)
+            return Response(serializer.data)
+        else:
+            return Response('mark does not exists', status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(request_body=ChecklistSerializer, operation_summary="update method")
+    def patch(self, request, mark_id):
+        check_list = self.get_object(mark_id)
+        serializer = ChecklistSerializer(check_list, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(operation_summary="file delete method")
+    def delete(self, request, check_id):
+        check_list = self.get_object(check_id)
+        if check_list:
+            check_list.delete()
+            return Response('comment successfully deleted', status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response('Mark not found', status=status.HTTP_404_NOT_FOUND)

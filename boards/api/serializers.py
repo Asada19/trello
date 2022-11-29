@@ -2,21 +2,47 @@ from rest_framework import serializers
 from ..models import Board, Column, Card
 
 
+class FileSerializer(serializers.Serializer):
+    file = serializers.FileField()
+
+    def create(self, validated_data):
+        return FileSerializer(**validated_data).save()
+
+
 class ChecklistSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=30)
     is_done = serializers.BooleanField(default=False)
+
+    def create(self, validated_data):
+        return ChecklistSerializer(**validated_data).save()
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data["title"]
+        instance.is_done = validated_data["is_done"]
+        instance.save()
+        return instance
 
 
 class MarkSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=30)
-    color = serializers.CharField(default='#000', max_length=7)
+    color = serializers.CharField(max_length=7, default='#000')
+
+    def create(self, validated_data):
+        return MarkSerializer(**validated_data).save()
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data["title"]
+        instance.color = validated_data["color"]
+        instance.save()
+        return instance
 
 
 class CommentSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     text = serializers.CharField(max_length=300)
     created_on = serializers.DateTimeField()
+    author = serializers.StringRelatedField()
 
 
 class CardSerializer(serializers.Serializer):
@@ -51,6 +77,13 @@ class BoardDetailSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=30, required=False)
     background = serializers.ImageField(required=False)
     column = serializers.StringRelatedField(many=True, read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data["title"]
+        instance.background = validated_data["background"]
+        instance.is_done = validated_data["is_donne"]
+        instance.save()
+        return instance
 
 
 class BoardSerializer(serializers.Serializer):
