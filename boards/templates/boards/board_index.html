@@ -7,7 +7,7 @@
     {% if board.owner == request.user or board.member == request.users %}
     <div class="card" style="width: 18rem;">
         {% if board.background %}
-        <img class="card-img-top" src="{{ board.background.url }}"/>
+        <img class="card-img-top" src="{{ board.background.url|default_if_none:'#' }}"/>
         {% else %}
         <P></P>
         {% endif %}

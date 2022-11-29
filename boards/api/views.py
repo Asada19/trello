@@ -392,3 +392,14 @@ class ChecklistDetailView(APIView):
             return Response('comment successfully deleted', status=status.HTTP_204_NO_CONTENT)
         else:
             return Response('Mark not found', status=status.HTTP_404_NOT_FOUND)
+
+
+class Archive(APIView):
+
+    @swagger_auto_schema(operation_description='archive board list')
+    def get(self, request):
+        queryset = Board.objects.filter(is_active=False)
+        serializer = BoardSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+

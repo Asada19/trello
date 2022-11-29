@@ -9,7 +9,7 @@ from django.urls import reverse
 class Board(models.Model):
     title = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE, null=True)
-    background = models.ImageField(upload_to='background', blank=True)
+    background = models.ImageField(upload_to='background', blank=True, null=True)
     members = models.ManyToManyField(to=User, related_name='boards')
     is_active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -21,9 +21,10 @@ class Board(models.Model):
 
     def save(self, *args, **kwargs):
         super(Board, self).save(*args, **kwargs)
-        img = Image.open(self.background.path)
-        if img.height > 300 or img.width > 300:
-            img.save(self.background.path, quality=20, optimize=True)
+        if self.background:
+            img = Image.open(self.background.path)
+            if img.height > 300 or img.width > 300:
+                img.save(self.background.path, quality=20, optimize=True)
 
     def __str__(self):
         return self.title
@@ -80,14 +81,9 @@ class Mark(models.Model):
     title = models.CharField(blank=True, max_length=30)
 
 
-class Archiwe(models.Model):
-    board = models.ForeignKey(Board, on_delete=models.CASCADE, null=True, blank=True)
-    owner = models.OneToOneField(User, related_name='archiwe', on_delete=models.CASCADE)
-
-
 class Favorite(models.Model):
-    space = models.JSONField()
-    owner = models.OneToOneField(User, related_name='favorite', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='favorite', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name='favorite', on_delete=models.DO_NOTHING, null=True)
 
 
 class File(models.Model):

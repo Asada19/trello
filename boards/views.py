@@ -51,11 +51,7 @@ class BoardCreateView(CreateView):
     def post(self, request):
         form = BoardCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            board = Board.objects.create(
-                title=form.cleaned_data["title"],
-                background=form.cleaned_data["background"],
-                owner=request.user
-            )
+            board = form.save()
             board.save()
         return HttpResponseRedirect(reverse_lazy('board_index'))
 
@@ -284,6 +280,6 @@ class SearchView(ListView):
     def get_queryset(self):
         query = self.request.GET.get("q")
         object_list = Board.objects.filter(
-            Q(title__icontains=query)
+            Q(title__icontains=query) | Q(title__icontain=query)
         )
         return object_list

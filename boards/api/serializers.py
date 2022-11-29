@@ -77,11 +77,12 @@ class BoardDetailSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=30, required=False)
     background = serializers.ImageField(required=False)
     column = serializers.StringRelatedField(many=True, read_only=True)
+    is_active = serializers.BooleanField()
 
     def update(self, instance, validated_data):
         instance.title = validated_data["title"]
         instance.background = validated_data["background"]
-        instance.is_done = validated_data["is_donne"]
+        instance.is_active = validated_data["is_active"]
         instance.save()
         return instance
 

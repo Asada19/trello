@@ -49,6 +49,7 @@
                             {% for mark in marks %}
                             <p style="border: {{ mark.color }}; width: 100px; height: 20px;background-color:{{ mark.color }}"
                                class="rounded text-white py-0.5 px-1 mx-1">
+                                {{ mark.title }}
                             </p>
                             {% endfor %}
                             <label for="card-label-add">
