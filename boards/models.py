@@ -93,3 +93,10 @@ class File(models.Model):
     def __str__(self):
         return self.file
 
+
+class Member(models.Model):
+    user = models.ForeignKey(User, related_name='member', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name='boar_member', on_delete=models.CASCADE)
+
+
+

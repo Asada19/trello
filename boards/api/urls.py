@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import BoardAPIView, BoardDetailView, ColumnAPIView, ColumnDetailView, CardAPIView, CardDetailView, \
     MarkAPIView, MarkDetailView, CommentAPIView, CommentDetailView, FileAPIView, FileDetailView, ChecklistAPIView, \
-    ChecklistDetailView, Archive, FavoriteView, FavoriteListView
+    ChecklistDetailView, Archive, FavoriteView, FavoriteListView, MemberView, MemberListView
 
 urlpatterns = [
     # user
@@ -30,5 +30,6 @@ urlpatterns = [
     path('file/<int:file_id>', FileDetailView.as_view(), name='file-detail'),
     path('check_list/<int:check_id>', ChecklistDetailView.as_view(), name='check_list-detail'),
     path('favorite/', FavoriteListView.as_view(), name='favorite-list'),
-
+    path('member/<int:board_pk>', MemberView.as_view(), name='member-view'),
+    path('member_list/', MemberListView.as_view(), name='member-list'),
 ]

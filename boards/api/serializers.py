@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from ..models import Board, Column, Card, Favorite
 
 
@@ -38,7 +41,6 @@ class MarkSerializer(serializers.Serializer):
         return instance
 
 
-
 class CommentSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     text = serializers.CharField(max_length=300)
@@ -51,9 +53,6 @@ class CardSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=30)
     description = serializers.CharField(max_length=300, required=False)
     date_of_end = serializers.DateTimeField(default_timezone=None, required=False)
-    comment = serializers.StringRelatedField()
-    files = serializers.StringRelatedField()
-    mark = serializers.StringRelatedField()
 
     def create(self, validated_data):
         return CardSerializer(**validated_data).save()
@@ -84,19 +83,18 @@ class ColumnSerializer(serializers.Serializer):
         return ColumnSerializer(**validated_data).save()
 
 
-
 class BoardDetailSerializer(serializers.Serializer):
 
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=30, required=False)
     background = serializers.ImageField(required=False)
-    column = serializers.StringRelatedField(many=True, read_only=True)
-    is_active = serializers.BooleanField()
+    # column = serializers.StringRelatedField(many=True, read_only=True)
+    is_active = serializers.BooleanField(required=False)
 
     def update(self, instance, validated_data):
-        instance.title = validated_data["title"]
-        instance.background = validated_data["background"]
-        instance.is_active = validated_data["is_active"]
+        instance.title = validated_data.get('title', instance.title)
+        instance.background = validated_data.get('background', instance.background)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         return instance
 
@@ -107,9 +105,10 @@ class BoardDetailSerializer(serializers.Serializer):
 
 
 class BoardSerializer(serializers.Serializer):
+
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=30)
-    background = serializers.ImageField(required=False)
+    background = serializers.ImageField(required=False, default=None)
 
     def create(self, validated_data):
         board = Board(
@@ -134,4 +133,10 @@ class FavoriteSerializer(serializers.Serializer):
         return FavoriteSerializer(**validated_data).save()
 
 
+class MemberSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    user = serializers.IntegerField()
+    board = serializers.IntegerField()
 
+    def create(self, validated_data):
+        return MemberSerializer(**validated_data).save()

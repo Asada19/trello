@@ -11,7 +11,7 @@
 <div class="d-grid gap-2 d-md-block">
     {% if user.is_authenticated %}
         <button type="button">
-            <a href="{% url 'account_reset_password' %}">Change password</a>
+            <a href="{% url 'account_change_password' %}">Change password</a>
         </button>
         <buttonm type="button">
             <a href="{% url 'account_logout' %}">Logout</a>
