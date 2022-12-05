@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
@@ -52,9 +53,8 @@ INSTALLED_APPS = [
 ]
 CRISPY_TEMPLATE_PACK = 'uni_form'
 
-
-
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -128,9 +128,23 @@ SWAGGER_SETTINGS = {
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "dashboard"
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {}
-}
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com',
+#             'secret': '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',
+#             'key': ''
+#         },
+#         'SCOPE': [
+#             'profile',
+#             'email',
+#         ],
+#         'AUTH_PARAMS': {
+#             'access_type': 'online',
+#         },
+#         'OAUTH_PKCE_ENABLED': True,
+#     }
+# }
 
 EMAIL_HOST = "smtp.gmail.com"
 DEFAULT_FROM_EMAIL = EMAIL_HOST
@@ -139,6 +153,7 @@ EMAIL_HOST_PASSWORD = 'gotpahdqsegcssoo'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
+# FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
@@ -154,16 +169,10 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-#
-# REST_FRAMEWORK = {
-#
-#     'TEST_REQUEST_RENDERER_CLASSES': [
-#         'rest_framework.renderers.MultiPartRenderer',
-#         'rest_framework.renderers.JSONRenderer',
-#         'rest_framework.renderers.TemplateHTMLRenderer'
-#     ]
-#
-# }
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
 
 
 # Internationalization

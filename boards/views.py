@@ -13,8 +13,16 @@ from .forms import BoardCreationForm, CommentForm, CardUpdateForm, MarkFormset, 
 from .models import Board, Card, Column, Comment, Mark, Checkpoint, Checklist, File
 
 
-class FavoriteView(TemplateView):
-    template_name = 'favorite.html'
+class ArchiveView(TemplateView):
+    model = Board
+    template_name = 'boards/archive.html'
+    context_object_name = 'boards'
+
+
+class FavoriteView(ListView):
+    model = Board
+    template_name = 'boards/favorite.html'
+    context_object_name = 'boards'
 
 
 class BoardListView(ListView):
@@ -52,14 +60,15 @@ class BoardCreateView(CreateView):
         form = BoardCreationForm(request.POST, request.FILES)
         if form.is_valid():
             board = form.save()
+            board.owner = request.user
             board.save()
         return HttpResponseRedirect(reverse_lazy('board_index'))
 
 
 class BoardUpdateView(UpdateView):
     model = Board
-    fields = ['title', 'background']
-    template_name = 'boards//update_form.html'
+    fields = ['title', 'background', 'is_active', 'members']
+    template_name = 'boards/update_form.html'
 
     def get_success_url(self):
         return '/'
@@ -78,6 +87,7 @@ def new_column(request, pk):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     title = body['title']
+
     assert title and board_id
     Column.objects.create(title=title, board_id=board_id.id)
     return redirect('board_detail', pk)
@@ -178,7 +188,7 @@ class CardView(View):
 
     def drop(request):
         payload = json.loads(request.body)
-        card_id = int(payload.get('pk'))
+        card_id = int(payload.get('card_id'))
         column_id = int(payload.get('column_id'))
         assert card_id and column_id
         card = Card.objects.get(id=card_id)
@@ -283,3 +293,5 @@ class SearchView(ListView):
             Q(title__icontains=query) | Q(title__icontain=query)
         )
         return object_list
+
+

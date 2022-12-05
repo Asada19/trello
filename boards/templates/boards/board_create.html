@@ -4,8 +4,7 @@
 <div>
     <form action="" enctype='multipart/form-data' method="post">
         {% csrf_token %}
-        {{ form.title }}
-        {{ form.background }}
+        {{ form.as_p }}
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 </div>

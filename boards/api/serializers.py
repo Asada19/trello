@@ -75,7 +75,7 @@ class ColumnSerializer(serializers.Serializer):
         return representation
 
     def update(self, instance, validated_data):
-        instance.title = validated_data["title"]
+        instance.title = validated_data.get('title', instance.title)
         instance.save()
         return instance
 
@@ -88,7 +88,6 @@ class BoardDetailSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=30, required=False)
     background = serializers.ImageField(required=False)
-    # column = serializers.StringRelatedField(many=True, read_only=True)
     is_active = serializers.BooleanField(required=False)
 
     def update(self, instance, validated_data):

@@ -1,5 +1,6 @@
 import datetime
 from django.shortcuts import get_object_or_404
+from rest_framework import filters
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -9,12 +10,14 @@ from rest_framework.views import APIView
 from .serializers import BoardSerializer, BoardDetailSerializer, ColumnSerializer, CardSerializer, MarkSerializer, \
     CommentSerializer, FileSerializer, ChecklistSerializer, FavoriteSerializer, MemberSerializer
 from ..models import Board, Column, Card, Mark, Comment, File, Checklist, Favorite, Member
-from ..permissions import IsOwnerOrReadOnly
+from ..permissions import IsOwner
 
 
 class BoardAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     permission_class = [IsAuthenticated, ]
+    filter_backends = [filters.SearchFilter]
+    search_filters = ['title', 'owner']
 
     @swagger_auto_schema(operation_summary='List all Board Objects')
     def get(self, request):
@@ -37,7 +40,7 @@ class BoardAPIView(APIView):
 
 class BoardDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    # permission_classes = [IsOwnerOrReadOnly, ]
+    permission_classes = [IsOwner, ]
 
     def get_object(self, pk):
         return Board.objects.get(pk=pk)
@@ -69,7 +72,7 @@ class BoardDetailView(APIView):
 
 class ColumnAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsOwnerOrReadOnly, ]
+    # permission_classes = [IsOwnerOrReadOnly, ]
 
     @swagger_auto_schema(operation_summary="column list method")
     def get(self, requset, pk):

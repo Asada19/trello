@@ -11,6 +11,10 @@
                     {{ form.as_table }}
                 </table>
                 <input value="Submit" type="submit">
+                <input
+                    value="Cancel"
+                    type="button"
+                    onclick="location.href='{% url "card_detail"  card.id %}';">
             </form>
         </div>
     </div>

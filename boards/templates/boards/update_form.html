@@ -65,7 +65,7 @@
             <h1>Update Board</h1>
             <form enctype='multipart/form-data' method="post">
                 {% csrf_token %}
-                {{ form|crispy }}
+                {{ form.as_p }}
                 <input onclick="window.history.back()" type="submit" value="Submit">
             </form>
             <button onclick="window.history.back()" type="button">✕</button>

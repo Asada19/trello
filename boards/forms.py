@@ -36,10 +36,10 @@ class SearchForm(forms.Form):
 class CardUpdateForm(forms.ModelForm):
     class Meta:
         model = Card
-        fields = ('title', 'description')
-        # widgets = {
-        #     'date_of_end': DateTimeInput(attrs={"type": "datetime-local", 'required': 'False'})
-        # }
+        fields = ('title', 'description', 'date_of_end')
+        widgets = {
+            'date_of_end': DateTimeInput(attrs={"type": "datetime-local"})
+        }
 
 
 class MarkForm(forms.ModelForm):

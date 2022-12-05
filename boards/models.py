@@ -13,6 +13,7 @@ class Board(models.Model):
     members = models.ManyToManyField(to=User, related_name='boards')
     is_active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
+    last_changed = models.DateTimeField(null=True)
 
     def image_validator(self):
         valid_formats = ['png', 'jpeg', 'jpg']
@@ -46,8 +47,7 @@ class Card(models.Model):
     column = models.ForeignKey(Column, related_name='cards', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    members = models.ManyToManyField(User, related_name='mark_card', blank=True)
-    date_of_end = models.DateTimeField(auto_now=True)
+    date_of_end = models.DateTimeField(null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse('card_detail', args=[str(self.id)])
@@ -95,8 +95,8 @@ class File(models.Model):
 
 
 class Member(models.Model):
-    user = models.ForeignKey(User, related_name='member', on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, related_name='boar_member', on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, related_name='member', on_delete=models.CASCADE)
+    board = models.ForeignKey(to=Board, related_name='member', on_delete=models.CASCADE)
 
 
 
