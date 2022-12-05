@@ -128,23 +128,23 @@ SWAGGER_SETTINGS = {
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "dashboard"
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'APP': {
-#             'client_id': '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com',
-#             'secret': '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',
-#             'key': ''
-#         },
-#         'SCOPE': [
-#             'profile',
-#             'email',
-#         ],
-#         'AUTH_PARAMS': {
-#             'access_type': 'online',
-#         },
-#         'OAUTH_PKCE_ENABLED': True,
-#     }
-# }
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
 
 EMAIL_HOST = "smtp.gmail.com"
 DEFAULT_FROM_EMAIL = EMAIL_HOST
@@ -153,14 +153,17 @@ EMAIL_HOST_PASSWORD = 'gotpahdqsegcssoo'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
-# FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+
+SITE_ID = 1
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+OLD_PASSWORD_FIELD_ENABLED = True
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 
 AUTHENTICATION_BACKENDS = [

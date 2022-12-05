@@ -87,7 +87,6 @@ def new_column(request, pk):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     title = body['title']
-
     assert title and board_id
     Column.objects.create(title=title, board_id=board_id.id)
     return redirect('board_detail', pk)

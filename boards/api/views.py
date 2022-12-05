@@ -40,7 +40,7 @@ class BoardAPIView(APIView):
 
 class BoardDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsOwner, ]
+    # permission_classes = [IsOwner, ]
 
     def get_object(self, pk):
         return Board.objects.get(pk=pk)

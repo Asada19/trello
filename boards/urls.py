@@ -7,7 +7,7 @@ from .views import BoardListView, BoardCreateView, FavoriteView, BoardDetailView
 
 urlpatterns = [
     # Board
-    path("", BoardListView.as_view(), name="с"),
+    path("", BoardListView.as_view(), name="board_index"),
     path("create", BoardCreateView.as_view(), name='board_create'),
     path("<int:pk>/", BoardDetailView.as_view(), name="board_detail"),
     path("<int:pk>/update", BoardUpdateView.as_view(), name='board_update'),
