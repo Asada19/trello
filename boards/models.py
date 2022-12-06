@@ -10,7 +10,7 @@ class Board(models.Model):
     title = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE, null=True)
     background = models.ImageField(upload_to='background', blank=True, null=True)
-    members = models.ManyToManyField(to=User, related_name='boards')
+    # members = models.ManyToManyField(to=User, related_name='boards')
     is_active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
     last_changed = models.DateTimeField(null=True)
@@ -29,6 +29,25 @@ class Board(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Favorite(models.Model):
+    owner = models.ForeignKey(to=User, related_name='favorite', on_delete=models.CASCADE)
+    board = models.ForeignKey(to=Board, on_delete=models.DO_NOTHING, null=True)
+
+
+class Member(models.Model):
+    user = models.ForeignKey(to=User, related_name='boards', on_delete=models.CASCADE)
+    board = models.ForeignKey(to=Board, related_name='members', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.board.id}:{self.user.id}'
+
+
+class LastSeen(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='last_seen')
+    board = models.ForeignKey(to=Board, on_delete=models.CASCADE)
+    seen_time = models.DateTimeField(auto_now=True)
 
 
 class Column(models.Model):
@@ -58,21 +77,21 @@ class Card(models.Model):
 
 class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    card = models.ForeignKey(Card, related_name='comment', on_delete=models.CASCADE)
+    card = models.ForeignKey(to=Card, related_name='comment', on_delete=models.CASCADE)
     text = models.TextField(blank=True, max_length=300)
     created_on = models.DateTimeField(auto_now_add=True)
 
 
 class Checklist(models.Model):
     title = models.CharField(max_length=30)
-    card = models.ForeignKey(Card, related_name='check_list', on_delete=models.CASCADE)
+    card = models.ForeignKey(to=Card, related_name='check_list', on_delete=models.CASCADE)
     is_done = models.BooleanField(default=False)
 
 
 class Checkpoint(models.Model):
     task = models.CharField(max_length=30)
     done = models.BooleanField(default=False)
-    checklist = models.ForeignKey(Checklist, related_name='checkpoint', on_delete=models.CASCADE)
+    checklist = models.ForeignKey(to=Checklist, related_name='checkpoint', on_delete=models.CASCADE)
 
 
 class Mark(models.Model):
@@ -81,22 +100,9 @@ class Mark(models.Model):
     title = models.CharField(blank=True, max_length=30)
 
 
-class Favorite(models.Model):
-    owner = models.ForeignKey(User, related_name='favorite', on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, related_name='favorite', on_delete=models.DO_NOTHING, null=True)
-
-
 class File(models.Model):
     card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='files')
     file = models.FileField(upload_to='Files/')
 
     def __str__(self):
         return self.file
-
-
-class Member(models.Model):
-    user = models.ForeignKey(to=User, related_name='member', on_delete=models.CASCADE)
-    board = models.ForeignKey(to=Board, related_name='member', on_delete=models.CASCADE)
-
-
-
