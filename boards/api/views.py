@@ -23,12 +23,11 @@ class BoardAPIView(APIView):
     def get(self, request):
         boards = Board.objects.filter(owner=[request.user.id][0])
         serializer = BoardSerializer(boards, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=BoardSerializer, operation_summary='Creates a new Board Object')
     def post(self, request):
         data = request.data
-        print(data)
         serializer = BoardSerializer(data=data)
         if serializer.is_valid():
             board = serializer.save()
@@ -57,7 +56,7 @@ class BoardDetailView(APIView):
         serializer = BoardDetailSerializer(board, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response('success!', status=status.HTTP_200_OK)
+            return Response('success!', status=status.HTTP_201_CREATED)
         return Response('bad request', status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(operation_summary="delete method")
@@ -104,7 +103,7 @@ class ColumnDetailView(APIView):
         column = Column.objects.get(id=column_id)
         if column:
             serializer = ColumnSerializer(column)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response('column does not exists', status=status.HTTP_404_NOT_FOUND)
 
@@ -447,7 +446,6 @@ class MemberView(APIView):
     def post(self, request, board_pk):
         # board = Board.objects.get(pk=board_pk)
         board = get_object_or_404(Board, pk=board_pk)
-        print(board)
         if board:
             object = Member(
                 user=request.user,

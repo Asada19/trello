@@ -19,7 +19,7 @@ class CardCreationForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ('text',)
+        fields = ['text',]
 
 
 class CardForm(forms.ModelForm):
@@ -36,7 +36,7 @@ class SearchForm(forms.Form):
 class CardUpdateForm(forms.ModelForm):
     class Meta:
         model = Card
-        fields = ('title', 'description', 'date_of_end')
+        fields = ['title', 'description', 'date_of_end']
         widgets = {
             'date_of_end': DateTimeInput(attrs={"type": "datetime-local"})
         }

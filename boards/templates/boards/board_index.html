@@ -4,7 +4,7 @@
 <h1>Boards</h1>
 <div class="row">
     {% for board in boards %}
-    {% if board.owner == request.user or board.member == request.users %}
+    {% if board.owner == request.user or board.members == request.users %}
     <div class="card" style="width: 18rem;">
         {% if board.background %}
         <img class="card-img-top" src="{{ board.background.url|default_if_none:'#' }}"/>

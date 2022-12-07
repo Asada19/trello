@@ -93,7 +93,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'other_db.sqlite3'),
+        }
+    },
+
+
 }
 
 
@@ -164,8 +169,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 OLD_PASSWORD_FIELD_ENABLED = True
 
 
-
-
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "social_core.backends.google.GoogleOAuth2",
@@ -195,6 +198,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = (
   os.path.join(BASE_DIR, 'static/'),
 )
