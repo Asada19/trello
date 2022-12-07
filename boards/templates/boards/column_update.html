@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block page_content %}
+<form method="post">
+    {% csrf_token %}
+    <input name="title" value="{{ column.title }}">
+    <br><br>
+    <input type="Submit" value="Save">
+</form>
+{% if board %}
+<a href="{% url 'board_detail' board.id %}">
+    <button>Cancel</button>
+</a>
+{% else %}
+<a href="{% url 'board_index' %}">
+    <button>Cancel</button>
+</a>
+{% endif %}
+{% endblock %}

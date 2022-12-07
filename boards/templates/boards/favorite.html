@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page_content %}
+<h1>Favorites</h1>
+<div class="row">
+    {% for board in boards %}
+    {% if board.owner == request.user and board in user.favorite %}
+    <div class="card" style="width: 18rem;">
+        {% if board.background %
+        <img class="card-img-top" src="{{ board.background.url }}"/>
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ board.title }}</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+                content.</p>
+            <a class="btn btn-primary stretched-link" href="{% url 'board_detail' board.pk %}">Go somewhere</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

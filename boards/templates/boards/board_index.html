@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page_content %}
+<h1>Boards</h1>
+<div class="row">
+    {% for board in boards %}
+    {% if board.owner == request.user or board.members == request.users %}
+    <div class="card" style="width: 18rem;">
+        {% if board.background %}
+        <img class="card-img-top" src="{{ board.background.url|default_if_none:'#' }}"/>
+        {% else %}
+        <P></P>
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ board.title }}</h5>
+            <p class="card-text"></p>
+            <a class="btn btn-primary stretched-link" href="{% url 'board_detail' board.pk %}">Go somewhere</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<div>
+    {% if user.is_authenticated %}
+    <button>
+        <a href="{% url 'board_create' %}"> Add board... </a>
+    </button>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,314 @@
+<style>
+    html {
+        position: relative;
+    }
+
+    body {
+        background-color: #F9FAFC;
+        font-family: "-apple-system", BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        min-height: 100vh;
+        font-size: 14px;
+        color: #4D4D62;
+    }
+
+    header img {
+        display: block;
+        margin: 40px auto;
+        width: 140px;
+    }
+
+    aside {
+        background: #FFE;
+        border: 2px solid #FEC;
+        border-radius: 3px;
+        box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 1em;
+        position: fixed;
+        right: 1em;
+        top: 1em;
+        width: 320px;
+        z-index: 1;
+    }
+
+    aside ul {
+        padding-left: 24px;
+    }
+
+    aside li {
+        margin: 8px 0;
+    }
+
+    main {
+        background-color: #FFFFFF;
+        border-radius: 3px;
+        padding: 25px 36px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0 0 10px;
+        margin: 40px auto;
+        width: 320px;
+        position: relative;
+        z-index: 1;
+    }
+
+    h3 {
+        text-align: center;
+        color: #5E6C84;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+        line-height: 28px;
+        margin-top: 10px;
+        margin-bottom: 25px;
+    }
+
+    form {
+        padding: 0 4px;
+    }
+
+    section {
+        box-sizing: border-box;
+        height: 56px;
+        overflow: hidden;
+        position: relative;
+        transition: height .25s ease-in-out;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    section.hidden {
+        display: block;
+        height: 0;
+    }
+
+    label {
+        color: #666;
+        display: none;
+    / / block;
+        margin: 0 0 6px;
+    }
+
+    input {
+        display: block;
+        font-size: 14px;
+        background-color: #FAFBFC;
+        border: 2px solid #DFE1E6;
+        box-sizing: border-box;
+        border-radius: 3px;
+        height: 44px;
+        width: 100%;
+        padding: 7px;
+        transition: background-color .2s ease-in-out 0s, border-color .2s ease-in-out 0s;
+    }
+
+    .read-only-username {
+        height: 26px;
+        line-height: 26px;
+        padding: 9px;
+        position: relative;
+    }
+
+    .edit-username {
+        color: #4D4D62;
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+
+    .toggle-password {
+        color: #4D4D62;
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+
+    .toggle-password.show .eye.closed {
+        display: none;
+    }
+
+    .toggle-password.hide .eye.open {
+        display: none;
+    }
+
+    button {
+        background: #5AAC44;
+        color: #fff;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        font-weight: bold;
+        border-radius: .3em;
+        padding: 10px 18px;
+    }
+
+    main img {
+        width: 100%;
+    }
+
+    hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid hsl(0, 0%, 80%);
+        margin: 25px 0 14px;
+        padding: 0;
+    }
+
+    .sso-link,
+    .bottom-links {
+        margin: 8px 0;
+        text-align: center;
+    }
+
+    a {
+        text-decoration: none;
+        color: #0052CC;
+    }
+
+    .login-method-separator {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+
+    .background {
+        background-image: url(https://aid-frontend.prod.atl-paas.net/atlassian-id/front-end/5.0.189/static/media/trello-left.abecab36.svg), url(https://aid-frontend.prod.atl-paas.net/atlassian-id/front-end/5.0.189/static/media/trello-right.2222cb95.svg);
+        background-repeat: no-repeat, no-repeat;
+        background-attachment: fixed, fixed;
+        background-size: 368px, 368px;
+        background-position: left bottom, right bottom;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 0;
+    }
+</style>
+{% block page_content %}
+{% load crispy_forms_tags %}
+<header>
+    <img src="https://d2k1ftgv7pobq7.cloudfront.net/meta/c/p/res/images/trello-header-logos/76ceb1faa939ede03abacb6efacdde16/trello-logo-blue.svg"/>
+</header>
+<main>
+    <h2>Register</h2>
+    <form method="post">
+        <h3>Sing up</h3>
+            {% csrf_token %}
+            <input type="email" placeholder="email">
+            {{ form }}
+        <input type="submit" value="Sing up">
+    </form>
+
+    <div class="login-method-separator">OR</div>
+    <div class="sso-link">
+        <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+        <br>
+        <a href="{% url 'login' %}">Login</a>
+    </div>
+    <hr/>
+</main>
+
+<div class="background"></div>
+{% endblock %}
+
+
+<!--<script>-->
+<!--    function checkLoginPolicy() {-->
+<!--        const email = document.querySelector('input[name=username]');-->
+<!--        const span = document.querySelector('.username-value');-->
+
+<!--        span.innerHTML = email.value;-->
+
+<!--        if (!email.value) {-->
+<!--            hidePasswordInput();-->
+<!--            updateButton("Continue");-->
+
+<!--        } else if (email.value.includes('atlassian')) {-->
+<!--            hidePasswordInput();-->
+<!--            updateButton("Log in with Atlassian");-->
+
+<!--        } else if (email.value.includes('acme') || email.value.includes('sso')) {-->
+<!--            hidePasswordInput();-->
+<!--            updateButton("Log in with SSO");-->
+
+<!--        } else {-->
+<!--            updateButton("Continue");-->
+<!--            return true;-->
+<!--        }-->
+
+<!--        return false;-->
+<!--    }-->
+
+<!--    function togglePassword() {-->
+<!--        const password = document.querySelector('input[name=password]');-->
+<!--        const a = document.querySelector('.toggle-password');-->
+
+<!--        a.classList.toggle('show');-->
+<!--        a.classList.toggle('hide');-->
+
+<!--        if (a.classList.contains('show')) {-->
+<!--            password.type = 'text';-->
+<!--        } else {-->
+<!--            password.type = 'password';-->
+<!--        }-->
+<!--    }-->
+
+<!--    function lockUsername() {-->
+<!--        const usernameInput = document.querySelector('input[name=username]');-->
+<!--        const usernameDiv = document.querySelector('.read-only-username')-->
+
+<!--        usernameInput.classList.add('hidden');-->
+<!--        usernameDiv.classList.remove('hidden');-->
+<!--        showPasswordInput();-->
+<!--    }-->
+
+<!--    function editUsername() {-->
+<!--        const usernameInput = document.querySelector('input[name=username]');-->
+<!--        const usernameDiv = document.querySelector('.read-only-username')-->
+<!--        const password = document.querySelector('input[name=password]');-->
+
+<!--        usernameInput.classList.remove('hidden');-->
+<!--        usernameDiv.classList.add('hidden');-->
+<!--        password.value = '';-->
+
+<!--        updateButton("Continue");-->
+<!--        hidePasswordInput();-->
+<!--    }-->
+
+<!--    function hidePasswordInput() {-->
+<!--        const pswdSection = document.querySelector('#pswd');-->
+<!--        pswdSection.classList.add('hidden');-->
+<!--    }-->
+
+<!--    function showPasswordInput() {-->
+<!--        const pswdSection = document.querySelector('#pswd');-->
+<!--        pswdSection.classList.remove('hidden');-->
+<!--    }-->
+
+<!--    function updateButton(text) {-->
+<!--        const btn = document.querySelector('button');-->
+<!--        btn.innerHTML = text || "Continue";-->
+<!--    }-->
+
+<!--    function onSubmit(e) {-->
+<!--        e.preventDefault();-->
+<!--        e.stopPropagation();-->
+
+<!--        const shouldShowPasswordInput = checkLoginPolicy();-->
+
+<!--        if (shouldShowPasswordInput) {-->
+<!--            lockUsername();-->
+<!--            showPasswordInput();-->
+<!--            updateButton('Log in');-->
+<!--        }-->
+<!--    }-->
+
+<!--    document.querySelector('.edit-username').addEventListener('click', editUsername);-->
+<!--    document.querySelector('.toggle-password').addEventListener('click', togglePassword);-->
+<!--    document.querySelector('input[name=username]').addEventListener('keyup', checkLoginPolicy);-->
+<!--    document.querySelector('form').addEventListener('submit', onSubmit);-->
+<!--</script>-->

@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+
+*.log
+*.pot
+*.pyc
+__pycache__/
+
+venv/
+db.sqlite3
+.idea
+/media/
+Trello/.env
