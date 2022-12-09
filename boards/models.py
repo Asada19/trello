@@ -1,16 +1,15 @@
-from io import BytesIO
 from PIL import Image
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
+from users.models import CustomUser
+
 
 class Board(models.Model):
     title = models.CharField(max_length=256)
-    owner = models.ForeignKey(User, related_name='Board', on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(CustomUser, related_name='Board', on_delete=models.CASCADE, null=True)
     background = models.ImageField(upload_to='background', blank=True, null=True)
-    # members = models.ManyToManyField(to=User, related_name='boards')
     is_active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
     last_changed = models.DateTimeField(null=True)
@@ -32,12 +31,12 @@ class Board(models.Model):
 
 
 class Favorite(models.Model):
-    owner = models.ForeignKey(to=User, related_name='favorite', on_delete=models.CASCADE)
+    owner = models.ForeignKey(to=CustomUser, related_name='favorite', on_delete=models.CASCADE)
     board = models.ForeignKey(to=Board, on_delete=models.DO_NOTHING, null=True)
 
 
 class Member(models.Model):
-    user = models.ForeignKey(to=User, related_name='boards', on_delete=models.CASCADE)
+    user = models.ForeignKey(to=CustomUser, related_name='boards', on_delete=models.CASCADE)
     board = models.ForeignKey(to=Board, related_name='members', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -45,7 +44,7 @@ class Member(models.Model):
 
 
 class LastSeen(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='last_seen')
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='last_seen')
     board = models.ForeignKey(to=Board, on_delete=models.CASCADE)
     seen_time = models.DateTimeField(auto_now=True)
 
@@ -76,9 +75,9 @@ class Card(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     card = models.ForeignKey(to=Card, related_name='comment', on_delete=models.CASCADE)
-    text = models.TextField(blank=True, max_length=300)
+    text = models.TextField(max_length=300)
     created_on = models.DateTimeField(auto_now_add=True)
 
 
@@ -97,7 +96,7 @@ class Checkpoint(models.Model):
 class Mark(models.Model):
     card = models.ForeignKey(to=Card, on_delete=models.CASCADE, related_name='mark')
     color = models.CharField(default='#000', max_length=7)
-    title = models.CharField(blank=True, max_length=30)
+    title = models.CharField(max_length=30, null=True)
 
 
 class File(models.Model):

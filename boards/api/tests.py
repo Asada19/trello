@@ -1,6 +1,4 @@
-import unittest
 from typing import Optional
-
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -8,15 +6,17 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework.test import APIClient
 from rest_framework.test import RequestsClient
-
 from boards.models import Board, Member, LastSeen, Column, Card
+import time
 
+from Trello.boards.models import Mark
 
 client = RequestsClient()
 factory = APIRequestFactory()
 apiclient = APIClient()
 
 User = get_user_model()
+response_time = 0.05
 
 
 def get_image():
@@ -42,14 +42,20 @@ class BoardTestCase(APITestCase):
     def test_get_board(self):
         user = get_user(1)
         self.client.force_login(user)
+        start_time = time.time()
         response = self.client.get(reverse('boards'), format='formdata')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_board(self):
         user = get_user(1)
         self.client.force_login(user)
         data = {'title': 'Example', 'background_img': get_image()}
+        start_time = time.time()
         response = self.client.post(reverse('boards'), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Board.objects.count(), 2)
 
@@ -57,13 +63,19 @@ class BoardTestCase(APITestCase):
         user = get_user(1)
         self.client.force_login(user)
         data = {'title': 'Updated title'}
+        start_time = time.time()
         response = self.client.patch(reverse('board-details', kwargs={'pk': 1}), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_delete_board(self):
         user = get_user(1)
         self.client.force_login(user)
+        start_time = time.time()
         response = self.client.delete(reverse('board-details', kwargs={'pk': 1}))
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
@@ -79,14 +91,20 @@ class ColumnTestCase(APITestCase):
     def test_get_column(self):
         user = get_user(1)
         self.client.force_login(user)
+        start_time = time.time()
         response = self.client.get(reverse('board-columns', kwargs={'pk': 1}), format='formdata')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_column(self):
         user = get_user(1)
         self.client.force_login(user)
         data = {'title': 'Example column'}
+        start_time = time.time()
         response = self.client.post(reverse('board-columns', kwargs={'pk': 1}), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Column.objects.count(), 1)
 
@@ -94,49 +112,70 @@ class ColumnTestCase(APITestCase):
         user = get_user(1)
         self.client.force_login(user)
         data = {'title': 'Updated title'}
+        start_time = time.time()
         response = self.client.patch(reverse('column-detail', args={'column_id': 1}), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_delete_column(self):
         user = get_user(1)
         self.client.force_login(user)
+        start_time = time.time()
         response = self.client.delete(reverse('column-detail', args={'column_id': 1}))
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-# class CardTestCase(APITestCase):
-#
-#     @classmethod
-#     def setUpTestData(cls):
-#         user1 = User(email='first@gmail.com', password='hello', first_name='Asada', last_name='Rain').save()
-#         board1 = Board(title='Test1', background=get_image(), owner=user1).save()
-#         Member(user=get_user(1), board=Board.objects.get(pk=1)).save()
-#         column1 = Column(title='Column1', board=board1)
-#         Card(title='Card1', description='', column=column1)
-#
-#     def test_get_card(self):
-#         user = get_user(1)
-#         self.client.force_login(user)
-#         response = self.client.get(reverse('column-detail', kwargs={'column_id': 1}), format='formdata')
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#
-#     def test_create_card(self):
-#         user = get_user(1)
-#         self.client.force_login(user)
-#         data = {'title': 'Example column'}
-#         response = self.client.post(reverse('column-detail', kwargs={'column_id': 1}), data, format='multipart')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         self.assertEqual(Column.objects.count(), 1)
-#
-#     def test_update_card(self):
-#         user = get_user(1)
-#         self.client.force_login(user)
-#         data = {'title': 'Updated title'}
-#         response = self.client.patch(reverse('card-detail', kwargs={'card_id': 1}), data, format='multipart')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#
-#     def test_delete_card(self):
-#         user = get_user(1)
-#         self.client.force_login(user)
-#         response = self.client.delete(reverse('card-detail', kwargs={'card_id': 1}))
-#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+class CardTestCase(APITestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        user1 = User(email='first@gmail.com', password='hello', first_name='Asada', last_name='Rain').save()
+        board1 = Board(title='Test1', background=get_image(), owner=user1).save()
+        Member(user=get_user(1), board=Board.objects.get(pk=1)).save()
+        column1 = Column(title='Column1', board=board1)
+        card1 = Card(title='Card1', description='', column=column1)
+        Mark(title='mark1', color='#0000')
+
+    def test_get_card(self):
+        user = get_user(1)
+        self.client.force_login(user)
+        start_time = time.time()
+        response = self.client.get(reverse('column-detail', kwargs={'column_id': 1}), format='formdata')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_card(self):
+        user = get_user(1)
+        self.client.force_login(user)
+        data = {'title': 'Example column'}
+        start_time = time.time()
+        response = self.client.post(reverse('column-detail', kwargs={'column_id': 1}), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Column.objects.count(), 1)
+
+    def test_update_card(self):
+        user = get_user(1)
+        self.client.force_login(user)
+        data = {'title': 'Updated title'}
+        start_time = time.time()
+        response = self.client.patch(reverse('card-detail', kwargs={'card_id': 1}), data, format='multipart')
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_delete_card(self):
+        user = get_user(1)
+        self.client.force_login(user)
+        start_time = time.time()
+        response = self.client.delete(reverse('card-detail', kwargs={'card_id': 1}))
+        end_time = time.time()
+        self.assertLess(end_time-start_time, response_time)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+

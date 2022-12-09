@@ -5,7 +5,7 @@ from .views import BoardAPIView, BoardDetailView, ColumnAPIView, ColumnDetailVie
 
 urlpatterns = [
     # user
-    path('user/rest-auth/', include('rest_auth.urls')),
+    path('rest-auth/', include('users.api.urls')),
     # path('user/rest-auth/registration/', include('rest_auth.registration.urls')),
 
     # board

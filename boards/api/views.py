@@ -10,12 +10,12 @@ from rest_framework.views import APIView
 from .serializers import BoardSerializer, BoardDetailSerializer, ColumnSerializer, CardSerializer, MarkSerializer, \
     CommentSerializer, FileSerializer, ChecklistSerializer, FavoriteSerializer, MemberSerializer
 from ..models import Board, Column, Card, Mark, Comment, File, Checklist, Favorite, Member
-from ..permissions import IsOwner
+from ..permissions import IsBoardOwner
 
 
 class BoardAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_class = [IsAuthenticated, ]
+    permission_class = [IsAuthenticated, IsBoardOwner]
     filter_backends = [filters.SearchFilter]
     search_filters = ['title', 'owner']
 
@@ -39,7 +39,7 @@ class BoardAPIView(APIView):
 
 class BoardDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    # permission_classes = [IsOwner, ]
+    permission_classes = [IsAuthenticated, IsBoardOwner]
 
     def get_object(self, pk):
         return Board.objects.get(pk=pk)
@@ -71,7 +71,7 @@ class BoardDetailView(APIView):
 
 class ColumnAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    # permission_classes = [IsOwnerOrReadOnly, ]
+    permission_classes = [IsAuthenticated, IsBoardOwner]
 
     @swagger_auto_schema(operation_summary="column list method")
     def get(self, requset, pk):
@@ -97,6 +97,7 @@ class ColumnAPIView(APIView):
 
 class ColumnDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="column get method")
     def get(self, request, column_id):
@@ -128,6 +129,7 @@ class ColumnDetailView(APIView):
 
 class CardAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="column list method")
     def get(self, requset, column_id):
@@ -154,6 +156,7 @@ class CardAPIView(APIView):
 
 class CardDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def get_object(self, card_id):
         return Card.objects.get(pk=card_id)
@@ -188,6 +191,7 @@ class CardDetailView(APIView):
 
 class MarkAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="column list method")
     def get(self, requset, card_id):
@@ -214,6 +218,7 @@ class MarkAPIView(APIView):
 
 class MarkDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def get_object(self, mark_id):
         return Card.objects.get(pk=mark_id)
@@ -248,6 +253,7 @@ class MarkDetailView(APIView):
 
 class CommentAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="comment list method")
     def get(self, requset, card_id):
@@ -275,6 +281,7 @@ class CommentAPIView(APIView):
 
 class CommentDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def get_object(self, comment_id):
         return Comment.objects.get(pk=comment_id)
@@ -300,6 +307,7 @@ class CommentDetailView(APIView):
 
 class FileAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="file list method")
     def get(self, requset, card_id):
@@ -323,6 +331,7 @@ class FileAPIView(APIView):
 
 class FileDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def get_object(self, file_id):
         return Comment.objects.get(pk=file_id)
@@ -348,6 +357,7 @@ class FileDetailView(APIView):
 
 class ChecklistAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_summary="Checklist list method")
     def get(self, requset, card_id):
@@ -373,6 +383,7 @@ class ChecklistAPIView(APIView):
 
 class ChecklistDetailView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def get_object(self, check_id):
         return Comment.objects.get(pk=check_id)
@@ -407,6 +418,7 @@ class ChecklistDetailView(APIView):
 
 class Archive(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     @swagger_auto_schema(operation_description='archive board list')
     def get(self, request):
@@ -417,6 +429,7 @@ class Archive(APIView):
 
 class FavoriteView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, IsBoardOwner)
 
     def post(self, request, board_pk):
         board = Board.objects.filter(pk=board_pk)
@@ -442,6 +455,7 @@ class FavoriteListView(APIView):
 
 class MemberView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request, board_pk):
         # board = Board.objects.get(pk=board_pk)
@@ -458,8 +472,9 @@ class MemberView(APIView):
 
 class MemberListView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request):
         queryset = Member.objects.all()
         serializer = MemberSerializer(queryset)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)

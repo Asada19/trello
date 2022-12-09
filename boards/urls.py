@@ -2,8 +2,7 @@ from django.urls import path, re_path
 
 from .views import BoardListView, BoardCreateView, FavoriteView, BoardDetailView, BoardUpdateView, \
     BoardDeleteView, new_column, ColumnUpdateView, CardUpdateView, new_card, view_card, CardDetailView, \
-    CardMarkCreateView, TitleChangeView, DescriptionChangeView, ChecklistCreateView, FileAddView, CardView, \
-    CommentCreateView, SearchView, ArchiveView
+    CardMarkCreateView, ChecklistCreateView, FileAddView, CardView, CommentCreateView, SearchView, ArchiveView
 
 urlpatterns = [
     # Board
