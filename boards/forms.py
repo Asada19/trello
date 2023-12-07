@@ -48,7 +48,7 @@ class SearchForm(forms.Form):
 class CardUpdateForm(forms.ModelForm):
     class Meta:
         model = Card
-        fields = ('bar', 'title', 'description', 'deadline')
+        fields = ('title', 'description')
         widgets = {
             'deadline': DateTimeInput(attrs={"type": "datetime-local", })
         }

@@ -49,7 +49,6 @@ INSTALLED_APPS = [
 CRISPY_TEMPLATE_PACK = 'uni_form'
 
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -58,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'Trello.urls'
@@ -118,16 +118,18 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {}
 }
 
-EMAIL_HOST = "smtp.gmail.com"
-DEFAULT_FROM_EMAIL = EMAIL_HOST
-EMAIL_HOST_USER = 'livencor@gmail.com'
-EMAIL_HOST_PASSWORD = 'gotpahdqsegcssoo'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# EMAIL_HOST = "smtp.gmail.com"
+# DEFAULT_FROM_EMAIL = EMAIL_HOST
+# EMAIL_HOST_USER = 'livencor@gmail.com'
+# EMAIL_HOST_PASSWORD = 'gotpahdqsegcssoo'
+# EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+#
+# ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '706366292617-r416f2taoq51smakka0jgqhqgtl3ur2r.apps.googleusercontent.com'
